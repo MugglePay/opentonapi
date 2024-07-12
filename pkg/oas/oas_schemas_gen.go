@@ -274,6 +274,47 @@ func (s *AccountAddress) SetIsWallet(val bool) {
 	s.IsWallet = val
 }
 
+// Ref: #/components/schemas/AccountBalance
+type AccountBalance struct {
+	Address string `json:"address"`
+	Balance string `json:"balance"`
+}
+
+// GetAddress returns the value of Address.
+func (s *AccountBalance) GetAddress() string {
+	return s.Address
+}
+
+// GetBalance returns the value of Balance.
+func (s *AccountBalance) GetBalance() string {
+	return s.Balance
+}
+
+// SetAddress sets the value of Address.
+func (s *AccountBalance) SetAddress(val string) {
+	s.Address = val
+}
+
+// SetBalance sets the value of Balance.
+func (s *AccountBalance) SetBalance(val string) {
+	s.Balance = val
+}
+
+// Ref: #/components/schemas/AccountBalances
+type AccountBalances struct {
+	Balances []AccountBalance `json:"balances"`
+}
+
+// GetBalances returns the value of Balances.
+func (s *AccountBalances) GetBalances() []AccountBalance {
+	return s.Balances
+}
+
+// SetBalances sets the value of Balances.
+func (s *AccountBalances) SetBalances(val []AccountBalance) {
+	s.Balances = val
+}
+
 // {'USD': 1, 'IDR': 1000}.
 type AccountCurrenciesBalance map[string]jx.Raw
 

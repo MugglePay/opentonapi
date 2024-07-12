@@ -318,6 +318,12 @@ type Handler interface {
 	//
 	// GET /v2/blockchain/validators
 	GetBlockchainValidators(ctx context.Context) (*Validators, error)
+	// GetBulkAccountJettonBalances implements getBulkAccountJettonBalances operation.
+	//
+	// Get jetton's bulk account id balance.
+	//
+	// GET /v2/accounts/jettons/{jetton_id}/balances
+	GetBulkAccountJettonBalances(ctx context.Context, params GetBulkAccountJettonBalancesParams) (*AccountBalances, error)
 	// GetChartRates implements getChartRates operation.
 	//
 	// Get chart by token.

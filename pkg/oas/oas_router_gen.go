@@ -106,6 +106,53 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						}
 
 						elem = origElem
+					case 'j': // Prefix: "jettons/"
+						origElem := elem
+						if l := len("jettons/"); len(elem) >= l && elem[0:l] == "jettons/" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						// Param: "jetton_id"
+						// Match until "/"
+						idx := strings.IndexByte(elem, '/')
+						if idx < 0 {
+							idx = len(elem)
+						}
+						args[0] = elem[:idx]
+						elem = elem[idx:]
+
+						if len(elem) == 0 {
+							break
+						}
+						switch elem[0] {
+						case '/': // Prefix: "/balances"
+							origElem := elem
+							if l := len("/balances"); len(elem) >= l && elem[0:l] == "/balances" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								// Leaf node.
+								switch r.Method {
+								case "GET":
+									s.handleGetBulkAccountJettonBalancesRequest([1]string{
+										args[0],
+									}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, "GET")
+								}
+
+								return
+							}
+
+							elem = origElem
+						}
+
+						elem = origElem
 					case 's': // Prefix: "search"
 						origElem := elem
 						if l := len("search"); len(elem) >= l && elem[0:l] == "search" {
@@ -3342,6 +3389,55 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							default:
 								return
 							}
+						}
+
+						elem = origElem
+					case 'j': // Prefix: "jettons/"
+						origElem := elem
+						if l := len("jettons/"); len(elem) >= l && elem[0:l] == "jettons/" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						// Param: "jetton_id"
+						// Match until "/"
+						idx := strings.IndexByte(elem, '/')
+						if idx < 0 {
+							idx = len(elem)
+						}
+						args[0] = elem[:idx]
+						elem = elem[idx:]
+
+						if len(elem) == 0 {
+							break
+						}
+						switch elem[0] {
+						case '/': // Prefix: "/balances"
+							origElem := elem
+							if l := len("/balances"); len(elem) >= l && elem[0:l] == "/balances" {
+								elem = elem[l:]
+							} else {
+								break
+							}
+
+							if len(elem) == 0 {
+								switch method {
+								case "GET":
+									// Leaf: GetBulkAccountJettonBalances
+									r.name = "GetBulkAccountJettonBalances"
+									r.summary = ""
+									r.operationID = "getBulkAccountJettonBalances"
+									r.pathPattern = "/v2/accounts/jettons/{jetton_id}/balances"
+									r.args = args
+									r.count = 1
+									return r, true
+								default:
+									return
+								}
+							}
+
+							elem = origElem
 						}
 
 						elem = origElem

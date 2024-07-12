@@ -69,6 +69,40 @@ func (h *Handler) GetAccountJettonBalance(ctx context.Context, params oas.GetAcc
 	return &jettonBalance, nil
 }
 
+
+func (h *Handler) GetBulkAccountJettonBalances(ctx context.Context, params oas.GetBulkAccountJettonBalancesParams) (*oas.AccountBalances, error) {
+	jettonAccount, err := tongo.ParseAddress(params.JettonID)
+	if err != nil {
+		return nil, toError(http.StatusBadRequest, err)
+	}
+	accounts := make([]tongo.AccountID, 0, len(params.AccountIds))
+	for _, id := range params.AccountIds {
+		account, err := tongo.ParseAddress(id)
+		if err != nil {
+			return nil, toError(http.StatusBadRequest, err)
+		}
+		accounts = append(accounts, account.ID)
+	}
+	wallets := make(map[tongo.AccountID]core.JettonWallet, len(accounts))
+	for _, account := range accounts {
+		wallet, err := h.storage.GetJettonWalletsByOwnerAddress(ctx, account, &jettonAccount.ID)
+		if err != nil {
+			return nil, toError(http.StatusInternalServerError, err)
+		}
+		if len(wallet) > 0 {
+			wallets[account] = wallet[0]
+		}
+	}
+	balances := make([]oas.AccountBalance, 0, len(wallets))
+	for account, wallet := range wallets {
+		balances = append(balances, oas.AccountBalance{
+			Address:  account.ToRaw(),
+			Balance:   wallet.Balance.String(),
+		})
+	}
+	return &oas.AccountBalances{Balances: balances}, nil
+}
+
 func (h *Handler) GetJettonInfo(ctx context.Context, params oas.GetJettonInfoParams) (*oas.JettonInfo, error) {
 	account, err := tongo.ParseAddress(params.AccountID)
 	if err != nil {

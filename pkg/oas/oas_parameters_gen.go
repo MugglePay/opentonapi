@@ -6170,6 +6170,135 @@ func decodeGetBlockchainTransactionByMessageHashParams(args [1]string, argsEscap
 	return params, nil
 }
 
+// GetBulkAccountJettonBalancesParams is parameters of getBulkAccountJettonBalances operation.
+type GetBulkAccountJettonBalancesParams struct {
+	// Jetton ID.
+	JettonID string
+	// Account ID.
+	AccountIds []string
+}
+
+func unpackGetBulkAccountJettonBalancesParams(packed middleware.Parameters) (params GetBulkAccountJettonBalancesParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "jetton_id",
+			In:   "path",
+		}
+		params.JettonID = packed[key].(string)
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "account_ids",
+			In:   "query",
+		}
+		params.AccountIds = packed[key].([]string)
+	}
+	return params
+}
+
+func decodeGetBulkAccountJettonBalancesParams(args [1]string, argsEscaped bool, r *http.Request) (params GetBulkAccountJettonBalancesParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode path: jetton_id.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "jetton_id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.JettonID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "jetton_id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	// Decode query: account_ids.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "account_ids",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotAccountIdsVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotAccountIdsVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.AccountIds = append(params.AccountIds, paramsDotAccountIdsVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if params.AccountIds == nil {
+					return errors.New("nil is invalid value")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "account_ids",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // GetChartRatesParams is parameters of getChartRates operation.
 type GetChartRatesParams struct {
 	// Accept jetton master address.

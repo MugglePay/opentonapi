@@ -1,6 +1,22 @@
 {
  "components": {
   "parameters": {
+   "accountIDBulkQuery": {
+    "description": "account ID",
+    "explode": false,
+    "in": "query",
+    "name": "account_ids",
+    "required": true,
+    "schema": {
+     "example": [
+      "0:97264395BD65A255A429B11326C84128B7D70FFED7949ABAE3036D506BA38621"
+     ],
+     "items": {
+      "type": "string"
+     },
+     "type": "array"
+    }
+   },
    "accountIDParameter": {
     "description": "account ID",
     "in": "path",
@@ -831,6 +847,37 @@
      "address",
      "is_scam",
      "is_wallet"
+    ],
+    "type": "object"
+   },
+   "AccountBalance": {
+    "properties": {
+     "address": {
+      "example": "0:0BB5A9F69043EEBDDA5AD2E946EB953242BD8F603FE795D90698CEEC6BFC60A0",
+      "type": "string"
+     },
+     "balance": {
+      "example": 597968399,
+      "type": "string"
+     }
+    },
+    "required": [
+     "address",
+     "balance"
+    ],
+    "type": "object"
+   },
+   "AccountBalances": {
+    "properties": {
+     "balances": {
+      "items": {
+       "$ref": "#/components/schemas/AccountBalance"
+      },
+      "type": "array"
+     }
+    },
+    "required": [
+     "balances"
     ],
     "type": "object"
    },
@@ -6113,6 +6160,38 @@
     ]
    }
   },
+  "/v2/accounts/jettons/{jetton_id}/balances": {
+   "get": {
+    "description": "Get jetton's bulk account id balance",
+    "operationId": "getBulkAccountJettonBalances",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/jettonIDParameter"
+     },
+     {
+      "$ref": "#/components/parameters/accountIDBulkQuery"
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AccountBalances"
+        }
+       }
+      },
+      "description": "jetton's balances"
+     },
+     "default": {
+      "$ref": "#/components/responses/Error"
+     }
+    },
+    "tags": [
+     "Accounts"
+    ]
+   }
+  },
   "/v2/accounts/search": {
    "get": {
     "description": "Search by account domain name",
@@ -10425,6 +10504,9 @@
   },
   {
    "url": "http://localhost:8081"
+  },
+  {
+   "url": "https://misc-opentonapi.l34rno.easypanel.host"
   }
  ],
  "tags": [

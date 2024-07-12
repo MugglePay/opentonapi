@@ -473,6 +473,15 @@ func (UnimplementedHandler) GetBlockchainValidators(ctx context.Context) (r *Val
 	return r, ht.ErrNotImplemented
 }
 
+// GetBulkAccountJettonBalances implements getBulkAccountJettonBalances operation.
+//
+// Get jetton's bulk account id balance.
+//
+// GET /v2/accounts/jettons/{jetton_id}/balances
+func (UnimplementedHandler) GetBulkAccountJettonBalances(ctx context.Context, params GetBulkAccountJettonBalancesParams) (r *AccountBalances, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetChartRates implements getChartRates operation.
 //
 // Get chart by token.

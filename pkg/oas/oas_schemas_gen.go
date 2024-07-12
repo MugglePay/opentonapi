@@ -5724,6 +5724,31 @@ func (s *GetBlockchainAccountTransactionsSortOrder) UnmarshalText(data []byte) e
 	}
 }
 
+type GetBulkAccountJettonBalancesReq struct {
+	JettonID   string   `json:"jetton_id"`
+	AccountIds []string `json:"account_ids"`
+}
+
+// GetJettonID returns the value of JettonID.
+func (s *GetBulkAccountJettonBalancesReq) GetJettonID() string {
+	return s.JettonID
+}
+
+// GetAccountIds returns the value of AccountIds.
+func (s *GetBulkAccountJettonBalancesReq) GetAccountIds() []string {
+	return s.AccountIds
+}
+
+// SetJettonID sets the value of JettonID.
+func (s *GetBulkAccountJettonBalancesReq) SetJettonID(val string) {
+	s.JettonID = val
+}
+
+// SetAccountIds sets the value of AccountIds.
+func (s *GetBulkAccountJettonBalancesReq) SetAccountIds(val []string) {
+	s.AccountIds = val
+}
+
 type GetChartRatesOK struct {
 	Points jx.Raw `json:"points"`
 }
@@ -12172,6 +12197,52 @@ func (o OptGetBlockchainAccountTransactionsSortOrder) Get() (v GetBlockchainAcco
 
 // Or returns value if set, or given parameter if does not.
 func (o OptGetBlockchainAccountTransactionsSortOrder) Or(d GetBlockchainAccountTransactionsSortOrder) GetBlockchainAccountTransactionsSortOrder {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptGetBulkAccountJettonBalancesReq returns new OptGetBulkAccountJettonBalancesReq with value set to v.
+func NewOptGetBulkAccountJettonBalancesReq(v GetBulkAccountJettonBalancesReq) OptGetBulkAccountJettonBalancesReq {
+	return OptGetBulkAccountJettonBalancesReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptGetBulkAccountJettonBalancesReq is optional GetBulkAccountJettonBalancesReq.
+type OptGetBulkAccountJettonBalancesReq struct {
+	Value GetBulkAccountJettonBalancesReq
+	Set   bool
+}
+
+// IsSet returns true if OptGetBulkAccountJettonBalancesReq was set.
+func (o OptGetBulkAccountJettonBalancesReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptGetBulkAccountJettonBalancesReq) Reset() {
+	var v GetBulkAccountJettonBalancesReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptGetBulkAccountJettonBalancesReq) SetTo(v GetBulkAccountJettonBalancesReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptGetBulkAccountJettonBalancesReq) Get() (v GetBulkAccountJettonBalancesReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptGetBulkAccountJettonBalancesReq) Or(d GetBulkAccountJettonBalancesReq) GetBulkAccountJettonBalancesReq {
 	if v, ok := o.Get(); ok {
 		return v
 	}

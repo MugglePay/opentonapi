@@ -70,37 +70,47 @@ func (h *Handler) GetAccountJettonBalance(ctx context.Context, params oas.GetAcc
 }
 
 
-func (h *Handler) GetBulkAccountJettonBalances(ctx context.Context, params oas.GetBulkAccountJettonBalancesParams) (*oas.AccountBalances, error) {
-	jettonAccount, err := tongo.ParseAddress(params.JettonID)
+func (h *Handler) GetBulkAccountJettonBalances(ctx context.Context, request oas.OptGetBulkAccountJettonBalancesReq) (*oas.AccountBalances, error) {
+	if len(request.Value.AccountIds) == 0 {
+		return nil, toError(http.StatusBadRequest, fmt.Errorf("empty list of ids"))
+	}
+	if !h.limits.isBulkQuantityAllowed(len(request.Value.AccountIds)) {
+		return nil, toError(http.StatusBadRequest, fmt.Errorf("the maximum number of accounts to request at once: %v", h.limits.BulkLimits))
+	}
+	jettonAccount, err := tongo.ParseAddress(request.Value.JettonID)
 	if err != nil {
 		return nil, toError(http.StatusBadRequest, err)
 	}
-	accounts := make([]tongo.AccountID, 0, len(params.AccountIds))
-	for _, id := range params.AccountIds {
+	accounts := make([]tongo.AccountID, 0, len(request.Value.AccountIds))
+	for _, id := range request.Value.AccountIds {
 		account, err := tongo.ParseAddress(id)
 		if err != nil {
 			return nil, toError(http.StatusBadRequest, err)
 		}
 		accounts = append(accounts, account.ID)
 	}
-	wallets := make(map[tongo.AccountID]core.JettonWallet, len(accounts))
+	resp := &oas.AccountBalances{}
 	for _, account := range accounts {
-		wallet, err := h.storage.GetJettonWalletsByOwnerAddress(ctx, account, &jettonAccount.ID)
+		wallets, err := h.storage.GetJettonWalletsByOwnerAddress(ctx, account, &jettonAccount.ID)
+		if errors.Is(err, core.ErrEntityNotFound) {
+			continue
+		}
 		if err != nil {
 			return nil, toError(http.StatusInternalServerError, err)
 		}
-		if len(wallet) > 0 {
-			wallets[account] = wallet[0]
+		if len(wallets) == 0 {
+			continue
 		}
-	}
-	balances := make([]oas.AccountBalance, 0, len(wallets))
-	for account, wallet := range wallets {
-		balances = append(balances, oas.AccountBalance{
-			Address:  account.ToRaw(),
-			Balance:   wallet.Balance.String(),
+		jettonBalance, err := h.convertJettonBalance(ctx, wallets[0], []string{})
+		if err != nil {
+			return nil, err
+		}
+		resp.Balances = append(resp.Balances, oas.AccountBalance{
+			Address: account.ToRaw(),
+			Balance: jettonBalance.Balance,
 		})
 	}
-	return &oas.AccountBalances{Balances: balances}, nil
+	return resp, nil
 }
 
 func (h *Handler) GetJettonInfo(ctx context.Context, params oas.GetJettonInfoParams) (*oas.JettonInfo, error) {

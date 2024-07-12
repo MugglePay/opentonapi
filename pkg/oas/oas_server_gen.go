@@ -322,8 +322,8 @@ type Handler interface {
 	//
 	// Get jetton's bulk account id balance.
 	//
-	// GET /v2/accounts/jettons/{jetton_id}/balances
-	GetBulkAccountJettonBalances(ctx context.Context, params GetBulkAccountJettonBalancesParams) (*AccountBalances, error)
+	// POST /v2/accounts/jettons/_bulk
+	GetBulkAccountJettonBalances(ctx context.Context, req OptGetBulkAccountJettonBalancesReq) (*AccountBalances, error)
 	// GetChartRates implements getChartRates operation.
 	//
 	// Get chart by token.

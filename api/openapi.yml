@@ -721,15 +721,14 @@ paths:
                 $ref: "#/components/schemas/JettonBalance"
         "default":
           $ref: "#/components/responses/Error"
-  /v2/accounts/jettons/{jetton_id}/balances:
-    get:
+  /v2/accounts/jettons/_bulk:
+    post:
       description: Get jetton's bulk account id balance
       operationId: getBulkAccountJettonBalances
       tags:
         - Accounts
-      parameters:
-        - $ref: "#/components/parameters/jettonIDParameter"
-        - $ref: "#/components/parameters/accountIDBulkQuery"
+      requestBody:
+        $ref: "#/components/requestBodies/JettonAccountIDs"
       responses:
         "200":
           description: jetton's balances
@@ -3242,6 +3241,24 @@ components:
                 items:
                   type: string
                   format: address
+                  example: 0:97264395BD65A255A429B11326C84128B7D70FFED7949ABAE3036D506BA38621
+    JettonAccountIDs:
+      description: a list of jetton of account ids
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - jetton_id
+              - account_ids
+            properties:
+              jetton_id:
+                type: string
+                example: 0:97264395BD65A255A429B11326C84128B7D70FFED7949ABAE3036D506BA38621
+              account_ids:
+                type: array
+                items:
+                  type: string
                   example: 0:97264395BD65A255A429B11326C84128B7D70FFED7949ABAE3036D506BA38621
     TonConnectProof:
       description: "Data that is expected from TON Connect"

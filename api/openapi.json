@@ -595,6 +595,33 @@
     "description": "bag-of-cells serialized to hex",
     "required": true
    },
+   "JettonAccountIDs": {
+    "content": {
+     "application/json": {
+      "schema": {
+       "properties": {
+        "account_ids": {
+         "items": {
+          "example": "0:97264395BD65A255A429B11326C84128B7D70FFED7949ABAE3036D506BA38621",
+          "type": "string"
+         },
+         "type": "array"
+        },
+        "jetton_id": {
+         "example": "0:97264395BD65A255A429B11326C84128B7D70FFED7949ABAE3036D506BA38621",
+         "type": "string"
+        }
+       },
+       "required": [
+        "jetton_id",
+        "account_ids"
+       ],
+       "type": "object"
+      }
+     }
+    },
+    "description": "a list of jetton of account ids"
+   },
    "LiteServerSendMessageRequest": {
     "content": {
      "application/json": {
@@ -6160,18 +6187,13 @@
     ]
    }
   },
-  "/v2/accounts/jettons/{jetton_id}/balances": {
-   "get": {
+  "/v2/accounts/jettons/_bulk": {
+   "post": {
     "description": "Get jetton's bulk account id balance",
     "operationId": "getBulkAccountJettonBalances",
-    "parameters": [
-     {
-      "$ref": "#/components/parameters/jettonIDParameter"
-     },
-     {
-      "$ref": "#/components/parameters/accountIDBulkQuery"
-     }
-    ],
+    "requestBody": {
+     "$ref": "#/components/requestBodies/JettonAccountIDs"
+    },
     "responses": {
      "200": {
       "content": {

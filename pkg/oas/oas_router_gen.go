@@ -106,50 +106,24 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						}
 
 						elem = origElem
-					case 'j': // Prefix: "jettons/"
+					case 'j': // Prefix: "jettons/_bulk"
 						origElem := elem
-						if l := len("jettons/"); len(elem) >= l && elem[0:l] == "jettons/" {
+						if l := len("jettons/_bulk"); len(elem) >= l && elem[0:l] == "jettons/_bulk" {
 							elem = elem[l:]
 						} else {
 							break
 						}
 
-						// Param: "jetton_id"
-						// Match until "/"
-						idx := strings.IndexByte(elem, '/')
-						if idx < 0 {
-							idx = len(elem)
-						}
-						args[0] = elem[:idx]
-						elem = elem[idx:]
-
 						if len(elem) == 0 {
-							break
-						}
-						switch elem[0] {
-						case '/': // Prefix: "/balances"
-							origElem := elem
-							if l := len("/balances"); len(elem) >= l && elem[0:l] == "/balances" {
-								elem = elem[l:]
-							} else {
-								break
+							// Leaf node.
+							switch r.Method {
+							case "POST":
+								s.handleGetBulkAccountJettonBalancesRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "POST")
 							}
 
-							if len(elem) == 0 {
-								// Leaf node.
-								switch r.Method {
-								case "GET":
-									s.handleGetBulkAccountJettonBalancesRequest([1]string{
-										args[0],
-									}, elemIsEscaped, w, r)
-								default:
-									s.notAllowed(w, r, "GET")
-								}
-
-								return
-							}
-
-							elem = origElem
+							return
 						}
 
 						elem = origElem
@@ -3392,52 +3366,28 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						}
 
 						elem = origElem
-					case 'j': // Prefix: "jettons/"
+					case 'j': // Prefix: "jettons/_bulk"
 						origElem := elem
-						if l := len("jettons/"); len(elem) >= l && elem[0:l] == "jettons/" {
+						if l := len("jettons/_bulk"); len(elem) >= l && elem[0:l] == "jettons/_bulk" {
 							elem = elem[l:]
 						} else {
 							break
 						}
 
-						// Param: "jetton_id"
-						// Match until "/"
-						idx := strings.IndexByte(elem, '/')
-						if idx < 0 {
-							idx = len(elem)
-						}
-						args[0] = elem[:idx]
-						elem = elem[idx:]
-
 						if len(elem) == 0 {
-							break
-						}
-						switch elem[0] {
-						case '/': // Prefix: "/balances"
-							origElem := elem
-							if l := len("/balances"); len(elem) >= l && elem[0:l] == "/balances" {
-								elem = elem[l:]
-							} else {
-								break
+							switch method {
+							case "POST":
+								// Leaf: GetBulkAccountJettonBalances
+								r.name = "GetBulkAccountJettonBalances"
+								r.summary = ""
+								r.operationID = "getBulkAccountJettonBalances"
+								r.pathPattern = "/v2/accounts/jettons/_bulk"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
 							}
-
-							if len(elem) == 0 {
-								switch method {
-								case "GET":
-									// Leaf: GetBulkAccountJettonBalances
-									r.name = "GetBulkAccountJettonBalances"
-									r.summary = ""
-									r.operationID = "getBulkAccountJettonBalances"
-									r.pathPattern = "/v2/accounts/jettons/{jetton_id}/balances"
-									r.args = args
-									r.count = 1
-									return r, true
-								default:
-									return
-								}
-							}
-
-							elem = origElem
 						}
 
 						elem = origElem

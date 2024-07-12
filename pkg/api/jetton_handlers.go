@@ -89,7 +89,7 @@ func (h *Handler) GetBulkAccountJettonBalances(ctx context.Context, request oas.
 		}
 		accounts = append(accounts, account.ID)
 	}
-	resp := &oas.AccountBalances{}
+	response := &oas.AccountBalances{}
 	for _, account := range accounts {
 		wallets, err := h.storage.GetJettonWalletsByOwnerAddress(ctx, account, &jettonAccount.ID)
 		if errors.Is(err, core.ErrEntityNotFound) {
@@ -101,16 +101,12 @@ func (h *Handler) GetBulkAccountJettonBalances(ctx context.Context, request oas.
 		if len(wallets) == 0 {
 			continue
 		}
-		jettonBalance, err := h.convertJettonBalance(ctx, wallets[0], []string{})
-		if err != nil {
-			return nil, err
-		}
-		resp.Balances = append(resp.Balances, oas.AccountBalance{
+		response.Balances = append(response.Balances, oas.AccountBalance{
 			Address: account.ToRaw(),
-			Balance: jettonBalance.Balance,
+			Balance: wallets[0].Balance.String(),
 		})
 	}
-	return resp, nil
+	return response, nil
 }
 
 func (h *Handler) GetJettonInfo(ctx context.Context, params oas.GetJettonInfoParams) (*oas.JettonInfo, error) {

@@ -9,7 +9,7 @@ COPY pkg pkg
 
 RUN apt-get update && \
     apt-get install -y libsecp256k1-0 libsodium23
-RUN go build -o /tmp/opentonapi github.com/tonkeeper/opentonapi/cmd/api
+RUN go build -o /tmp/opentonapi ./cmd/api
 
 FROM ubuntu:20.04 as runner
 RUN apt-get update && \

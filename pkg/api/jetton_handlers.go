@@ -64,7 +64,7 @@ func (h *Handler) GetAccountJettonBalance(ctx context.Context, params oas.GetAcc
 		return nil, toError(http.StatusInternalServerError, err)
 	}
 	balance := oas.JettonBalance{
-		Jetton: result.Address.ToRaw(),
+		Jetton: result.JettonAddress.ToRaw(),
 		Address: result.Address.ToRaw(),
 		Balance: result.Balance.String(),
 	}

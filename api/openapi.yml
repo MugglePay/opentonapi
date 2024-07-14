@@ -721,23 +721,6 @@ paths:
                 $ref: "#/components/schemas/JettonBalance"
         "default":
           $ref: "#/components/responses/Error"
-  /v2/accounts/jettons/_bulk:
-    post:
-      description: Get jetton's bulk account id balance
-      operationId: getBulkAccountJettonBalances
-      tags:
-        - Accounts
-      requestBody:
-        $ref: "#/components/requestBodies/JettonAccountIDs"
-      responses:
-        "200":
-          description: jetton's balances
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AccountBalances"
-        "default":
-          $ref: "#/components/responses/Error"
   /v2/accounts/{account_id}/jettons/history:
     get:
       description: Get the transfer jettons history for account
@@ -1672,6 +1655,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/JettonHolders"
+        "default":
+          $ref: "#/components/responses/Error"
+  /v2/jettons/{account_id}/_bulk:
+    post:
+      description: Get jetton's balance by address bulk
+      operationId: getBulkAccountJettonBalances
+      tags:
+        - Jettons
+      parameters:
+        - $ref: "#/components/parameters/accountIDParameter"
+      requestBody:
+        $ref: "#/components/requestBodies/AccountIDs"
+      responses:
+        "200":
+          description: jetton's balances
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountBalances"
         "default":
           $ref: "#/components/responses/Error"
   /v2/events/{event_id}/jettons:
@@ -3241,24 +3243,6 @@ components:
                 items:
                   type: string
                   format: address
-                  example: 0:97264395BD65A255A429B11326C84128B7D70FFED7949ABAE3036D506BA38621
-    JettonAccountIDs:
-      description: a list of jetton of account ids
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - jetton_id
-              - account_ids
-            properties:
-              jetton_id:
-                type: string
-                example: 0:97264395BD65A255A429B11326C84128B7D70FFED7949ABAE3036D506BA38621
-              account_ids:
-                type: array
-                items:
-                  type: string
                   example: 0:97264395BD65A255A429B11326C84128B7D70FFED7949ABAE3036D506BA38621
     TonConnectProof:
       description: "Data that is expected from TON Connect"

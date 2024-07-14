@@ -16918,10 +16918,6 @@ func (s *GetBulkAccountJettonBalancesReq) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *GetBulkAccountJettonBalancesReq) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("jetton_id")
-		e.Str(s.JettonID)
-	}
-	{
 		e.FieldStart("account_ids")
 		e.ArrStart()
 		for _, elem := range s.AccountIds {
@@ -16931,9 +16927,8 @@ func (s *GetBulkAccountJettonBalancesReq) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfGetBulkAccountJettonBalancesReq = [2]string{
-	0: "jetton_id",
-	1: "account_ids",
+var jsonFieldsNameOfGetBulkAccountJettonBalancesReq = [1]string{
+	0: "account_ids",
 }
 
 // Decode decodes GetBulkAccountJettonBalancesReq from json.
@@ -16945,20 +16940,8 @@ func (s *GetBulkAccountJettonBalancesReq) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "jetton_id":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.JettonID = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"jetton_id\"")
-			}
 		case "account_ids":
-			requiredBitSet[0] |= 1 << 1
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
 				s.AccountIds = make([]string, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -16987,7 +16970,7 @@ func (s *GetBulkAccountJettonBalancesReq) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000011,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

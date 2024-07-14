@@ -6124,14 +6124,14 @@ func (s *Server) handleGetBlockchainValidatorsRequest(args [0]string, argsEscape
 
 // handleGetBulkAccountJettonBalancesRequest handles getBulkAccountJettonBalances operation.
 //
-// Get jetton's bulk account id balance.
+// Get jetton's balance by address bulk.
 //
-// POST /v2/accounts/jettons/_bulk
-func (s *Server) handleGetBulkAccountJettonBalancesRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// POST /v2/jettons/{account_id}/_bulk
+func (s *Server) handleGetBulkAccountJettonBalancesRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getBulkAccountJettonBalances"),
 		semconv.HTTPMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/v2/accounts/jettons/_bulk"),
+		semconv.HTTPRouteKey.String("/v2/jettons/{account_id}/_bulk"),
 	}
 
 	// Start a span for this request.
@@ -6164,6 +6164,16 @@ func (s *Server) handleGetBulkAccountJettonBalancesRequest(args [0]string, argsE
 			ID:   "getBulkAccountJettonBalances",
 		}
 	)
+	params, err := decodeGetBulkAccountJettonBalancesParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
 	request, close, err := s.decodeGetBulkAccountJettonBalancesRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
@@ -6188,13 +6198,18 @@ func (s *Server) handleGetBulkAccountJettonBalancesRequest(args [0]string, argsE
 			OperationSummary: "",
 			OperationID:      "getBulkAccountJettonBalances",
 			Body:             request,
-			Params:           middleware.Parameters{},
-			Raw:              r,
+			Params: middleware.Parameters{
+				{
+					Name: "account_id",
+					In:   "path",
+				}: params.AccountID,
+			},
+			Raw: r,
 		}
 
 		type (
 			Request  = OptGetBulkAccountJettonBalancesReq
-			Params   = struct{}
+			Params   = GetBulkAccountJettonBalancesParams
 			Response = *AccountBalances
 		)
 		response, err = middleware.HookMiddleware[
@@ -6204,14 +6219,14 @@ func (s *Server) handleGetBulkAccountJettonBalancesRequest(args [0]string, argsE
 		](
 			m,
 			mreq,
-			nil,
+			unpackGetBulkAccountJettonBalancesParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.GetBulkAccountJettonBalances(ctx, request)
+				response, err = s.h.GetBulkAccountJettonBalances(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.GetBulkAccountJettonBalances(ctx, request)
+		response, err = s.h.GetBulkAccountJettonBalances(ctx, request, params)
 	}
 	if err != nil {
 		if errRes, ok := errors.Into[*ErrorStatusCode](err); ok {

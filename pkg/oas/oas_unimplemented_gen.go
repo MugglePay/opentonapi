@@ -475,10 +475,10 @@ func (UnimplementedHandler) GetBlockchainValidators(ctx context.Context) (r *Val
 
 // GetBulkAccountJettonBalances implements getBulkAccountJettonBalances operation.
 //
-// Get jetton's bulk account id balance.
+// Get jetton's balance by address bulk.
 //
-// POST /v2/accounts/jettons/_bulk
-func (UnimplementedHandler) GetBulkAccountJettonBalances(ctx context.Context, req OptGetBulkAccountJettonBalancesReq) (r *AccountBalances, _ error) {
+// POST /v2/jettons/{account_id}/_bulk
+func (UnimplementedHandler) GetBulkAccountJettonBalances(ctx context.Context, req OptGetBulkAccountJettonBalancesReq, params GetBulkAccountJettonBalancesParams) (r *AccountBalances, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

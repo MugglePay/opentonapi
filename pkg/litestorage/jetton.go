@@ -78,6 +78,67 @@ func (s *LiteStorage) GetJettonWalletsByOwnerAddress(ctx context.Context, addres
 	return results, nil
 }
 
+func (s *LiteStorage) GetJettonWalletByOwnerAddress(ctx context.Context, address tongo.AccountID, jetton tongo.AccountID) (*tongo.AccountID, error) {
+	// timer := prometheus.NewTimer(prometheus.ObserverFunc(func(v float64) {
+	// 	storageTimeHistogramVec.WithLabelValues("get_jetton_wallet_by_owner").Observe(v)
+	// }))
+	// defer timer.ObserveDuration()
+	_, result, err := abi.GetWalletAddress(ctx, s.executor, jetton, address.ToMsgAddress())
+	if err != nil {
+		return nil, err
+	}
+	addressResult := result.(abi.GetWalletAddressResult)
+	walletAddress, err := tongo.AccountIDFromTlb(addressResult.JettonWalletAddress)
+	if err != nil {
+		return nil, err
+	}
+	if walletAddress == nil {
+		return nil, nil
+	}
+	return walletAddress, nil
+}
+
+func (s *LiteStorage) GetJettonDataByJettonWallet(ctx context.Context, jetton tongo.AccountID) (*core.JettonHolder, error) {
+	// timer := prometheus.NewTimer(prometheus.ObserverFunc(func(v float64) {
+	// 	storageTimeHistogramVec.WithLabelValues("get_jetton_wallet_by_owner").Observe(v)
+	// }))
+	// defer timer.ObserveDuration()
+	jettonWallet, err := tongo.AccountIDFromTlb(jetton.ToMsgAddress())
+	if err != nil {
+		return nil, err
+	}
+	if jettonWallet == nil {
+		return nil, nil
+	}
+	_, result, err := abi.GetWalletData(ctx, s.executor, *jettonWallet)
+	if err != nil {
+		return nil, err
+	}
+	data := result.(abi.GetWalletDataResult)
+	owner, err := tongo.AccountIDFromTlb(data.Owner)
+	if err != nil {
+		return nil, err
+	}
+	if owner == nil {
+		return nil, nil
+	}
+	jettonAddress, err := tongo.AccountIDFromTlb(data.Jetton)
+	if err != nil {
+		return nil, err
+	}
+	if jettonAddress == nil {
+		return nil, nil
+	}
+	balance := big.Int(data.Balance)
+	holder := core.JettonHolder{
+		JettonAddress: *jettonAddress,
+		Address: *jettonWallet,
+		Owner: *owner,
+		Balance: decimal.NewFromBigInt(&balance, 0),
+	}
+	return &holder, nil
+}
+
 func (s *LiteStorage) GetJettonMasterMetadata(ctx context.Context, master tongo.AccountID) (tongo.JettonMetadata, error) {
 	timer := prometheus.NewTimer(prometheus.ObserverFunc(func(v float64) {
 		storageTimeHistogramVec.WithLabelValues("get_jetton_master_metadata").Observe(v)

@@ -595,33 +595,6 @@
     "description": "bag-of-cells serialized to hex",
     "required": true
    },
-   "JettonAccountIDs": {
-    "content": {
-     "application/json": {
-      "schema": {
-       "properties": {
-        "account_ids": {
-         "items": {
-          "example": "0:97264395BD65A255A429B11326C84128B7D70FFED7949ABAE3036D506BA38621",
-          "type": "string"
-         },
-         "type": "array"
-        },
-        "jetton_id": {
-         "example": "0:97264395BD65A255A429B11326C84128B7D70FFED7949ABAE3036D506BA38621",
-         "type": "string"
-        }
-       },
-       "required": [
-        "jetton_id",
-        "account_ids"
-       ],
-       "type": "object"
-      }
-     }
-    },
-    "description": "a list of jetton of account ids"
-   },
    "LiteServerSendMessageRequest": {
     "content": {
      "application/json": {
@@ -6187,33 +6160,6 @@
     ]
    }
   },
-  "/v2/accounts/jettons/_bulk": {
-   "post": {
-    "description": "Get jetton's bulk account id balance",
-    "operationId": "getBulkAccountJettonBalances",
-    "requestBody": {
-     "$ref": "#/components/requestBodies/JettonAccountIDs"
-    },
-    "responses": {
-     "200": {
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/AccountBalances"
-        }
-       }
-      },
-      "description": "jetton's balances"
-     },
-     "default": {
-      "$ref": "#/components/responses/Error"
-     }
-    },
-    "tags": [
-     "Accounts"
-    ]
-   }
-  },
   "/v2/accounts/search": {
    "get": {
     "description": "Search by account domain name",
@@ -8399,6 +8345,38 @@
        }
       },
       "description": "jetton info"
+     },
+     "default": {
+      "$ref": "#/components/responses/Error"
+     }
+    },
+    "tags": [
+     "Jettons"
+    ]
+   }
+  },
+  "/v2/jettons/{account_id}/_bulk": {
+   "post": {
+    "description": "Get jetton's balance by address bulk",
+    "operationId": "getBulkAccountJettonBalances",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/accountIDParameter"
+     }
+    ],
+    "requestBody": {
+     "$ref": "#/components/requestBodies/AccountIDs"
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AccountBalances"
+        }
+       }
+      },
+      "description": "jetton's balances"
      },
      "default": {
       "$ref": "#/components/responses/Error"

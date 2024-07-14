@@ -6170,6 +6170,72 @@ func decodeGetBlockchainTransactionByMessageHashParams(args [1]string, argsEscap
 	return params, nil
 }
 
+// GetBulkAccountJettonBalancesParams is parameters of getBulkAccountJettonBalances operation.
+type GetBulkAccountJettonBalancesParams struct {
+	// Account ID.
+	AccountID string
+}
+
+func unpackGetBulkAccountJettonBalancesParams(packed middleware.Parameters) (params GetBulkAccountJettonBalancesParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "account_id",
+			In:   "path",
+		}
+		params.AccountID = packed[key].(string)
+	}
+	return params
+}
+
+func decodeGetBulkAccountJettonBalancesParams(args [1]string, argsEscaped bool, r *http.Request) (params GetBulkAccountJettonBalancesParams, _ error) {
+	// Decode path: account_id.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "account_id",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.AccountID = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "account_id",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // GetChartRatesParams is parameters of getChartRates operation.
 type GetChartRatesParams struct {
 	// Accept jetton master address.

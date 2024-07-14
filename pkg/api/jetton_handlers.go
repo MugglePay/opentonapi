@@ -69,39 +69,44 @@ func (h *Handler) GetAccountJettonBalance(ctx context.Context, params oas.GetAcc
 	return &jettonBalance, nil
 }
 
-
-func (h *Handler) GetBulkAccountJettonBalances(ctx context.Context, request oas.OptGetBulkAccountJettonBalancesReq) (*oas.AccountBalances, error) {
+func (h *Handler) GetBulkAccountJettonBalances(ctx context.Context, request oas.OptGetBulkAccountJettonBalancesReq, params oas.GetBulkAccountJettonBalancesParams) (*oas.AccountBalances, error) {
 	if len(request.Value.AccountIds) == 0 {
 		return nil, toError(http.StatusBadRequest, fmt.Errorf("empty list of ids"))
 	}
 	if !h.limits.isBulkQuantityAllowed(len(request.Value.AccountIds)) {
 		return nil, toError(http.StatusBadRequest, fmt.Errorf("the maximum number of accounts to request at once: %v", h.limits.BulkLimits))
 	}
-	jettonAccount, err := tongo.ParseAddress(request.Value.JettonID)
+	jetton, err := tongo.ParseAddress(params.AccountID)
 	if err != nil {
 		return nil, toError(http.StatusBadRequest, err)
 	}
 	var balances = oas.AccountBalances{
 		Balances: make([]oas.AccountBalance, 0, len(request.Value.AccountIds)),
 	}
-	for _, id := range request.Value.AccountIds {
-		account, err := tongo.ParseAddress(id)
+	for _, accountID := range request.Value.AccountIds {
+		account, err := tongo.ParseAddress(accountID)
 		if err != nil {
 			continue
 		}
-		wallets, err := h.storage.GetJettonWalletsByOwnerAddress(ctx, account.ID, &jettonAccount.ID)
+		jettonWallet, err := h.storage.GetJettonWalletByOwnerAddress(ctx, account.ID, jetton.ID)
+		if errors.Is(err, core.ErrEntityNotFound) {
+			continue
+		}
 		if err != nil {
 			continue
 		}
-		if len(wallets) == 0 {
+		result, err := h.storage.GetJettonDataByJettonWallet(ctx, *jettonWallet)
+		if errors.Is(err, core.ErrEntityNotFound) {
+			continue
+		}
+		if err != nil {
 			continue
 		}
 		balances.Balances = append(balances.Balances, oas.AccountBalance{
-			Address: account.ID.String(),
-			Balance: wallets[0].Balance.String(),
+			Address: result.Owner.ToRaw(),
+			Balance: result.Balance.String(),
 		})
 	}
-	fmt.Print(balances)
 	return &balances, nil
 }
 

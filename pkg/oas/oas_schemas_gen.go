@@ -5725,23 +5725,12 @@ func (s *GetBlockchainAccountTransactionsSortOrder) UnmarshalText(data []byte) e
 }
 
 type GetBulkAccountJettonBalancesReq struct {
-	JettonID   string   `json:"jetton_id"`
 	AccountIds []string `json:"account_ids"`
-}
-
-// GetJettonID returns the value of JettonID.
-func (s *GetBulkAccountJettonBalancesReq) GetJettonID() string {
-	return s.JettonID
 }
 
 // GetAccountIds returns the value of AccountIds.
 func (s *GetBulkAccountJettonBalancesReq) GetAccountIds() []string {
 	return s.AccountIds
-}
-
-// SetJettonID sets the value of JettonID.
-func (s *GetBulkAccountJettonBalancesReq) SetJettonID(val string) {
-	s.JettonID = val
 }
 
 // SetAccountIds sets the value of AccountIds.

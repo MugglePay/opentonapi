@@ -711,10 +711,9 @@ paths:
       parameters:
         - $ref: "#/components/parameters/accountIDParameter"
         - $ref: "#/components/parameters/jettonIDParameter"
-        - $ref: "#/components/parameters/currenciesQuery"
       responses:
         "200":
-          description: account jetton balance
+          description: account jetton info
           content:
             application/json:
               schema:
@@ -3322,8 +3321,6 @@ components:
             properties:
               body:
                 type: string
-                format: cell-base64
-
   schemas:
     Error:
       type: object
@@ -5346,32 +5343,19 @@ components:
     JettonBalance:
       type: object
       required:
-        - balance
-        - wallet_address
         - jetton
+        - address
+        - balance
       properties:
+        jetton:
+          type: string
+          example: 0:0BB5A9F69043EEBDDA5AD2E946EB953242BD8F603FE795D90698CEEC6BFC60A0
+        address:
+          type: string
+          example: 0:0BB5A9F69043EEBDDA5AD2E946EB953242BD8F603FE795D90698CEEC6BFC60A0
         balance:
           type: string
           example: 597968399
-        price:
-          $ref: "#/components/schemas/TokenRates"
-        wallet_address:
-          $ref: "#/components/schemas/AccountAddress"
-        jetton:
-          $ref: "#/components/schemas/JettonPreview"
-        lock:
-          type: object
-          required:
-            - amount
-            - till
-          properties:
-            amount:
-              type: string
-              example: 597968399
-            till:
-              type: integer
-              format: int64
-              example: 1678223064
     JettonsBalances:
       type: object
       required:
@@ -5384,9 +5368,13 @@ components:
     AccountBalance:
       type: object
       required:
+        - owner
         - address
         - balance
       properties:
+        owner:
+          type: string
+          example: 0:0BB5A9F69043EEBDDA5AD2E946EB953242BD8F603FE795D90698CEEC6BFC60A0
         address:
           type: string
           example: 0:0BB5A9F69043EEBDDA5AD2E946EB953242BD8F603FE795D90698CEEC6BFC60A0

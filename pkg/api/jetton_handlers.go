@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"slices"
 	"strings"
 
 	"github.com/tonkeeper/opentonapi/pkg/bath"
@@ -31,12 +30,10 @@ func (h *Handler) GetAccountJettonsBalances(ctx context.Context, params oas.GetA
 		Balances: make([]oas.JettonBalance, 0, len(wallets)),
 	}
 	for _, wallet := range wallets {
-		if slices.Contains(wallet.Extensions, "custom_payload") && !slices.Contains(params.SupportedExtensions, "custom_payload") {
-			continue
-		}
-		jettonBalance, err := h.convertJettonBalance(ctx, wallet, params.Currencies)
-		if err != nil {
-			continue
+		jettonBalance := oas.JettonBalance{
+			Jetton: wallet.Address.ToRaw(),
+			Address: wallet.Address.ToRaw(),
+			Balance: wallet.Balance.String(),
 		}
 		balances.Balances = append(balances.Balances, jettonBalance)
 	}
@@ -48,25 +45,30 @@ func (h *Handler) GetAccountJettonBalance(ctx context.Context, params oas.GetAcc
 	if err != nil {
 		return nil, toError(http.StatusBadRequest, err)
 	}
-	jettonAccount, err := tongo.ParseAddress(params.JettonID)
+	jetton, err := tongo.ParseAddress(params.JettonID)
 	if err != nil {
 		return nil, toError(http.StatusBadRequest, err)
 	}
-	wallets, err := h.storage.GetJettonWalletsByOwnerAddress(ctx, account.ID, &jettonAccount.ID)
+	jettonWallet, err := h.storage.GetJettonWalletByOwnerAddress(ctx, account.ID, jetton.ID)
 	if errors.Is(err, core.ErrEntityNotFound) {
 		return &oas.JettonBalance{}, nil
 	}
 	if err != nil {
 		return nil, toError(http.StatusInternalServerError, err)
 	}
-	if len(wallets) == 0 {
+	result, err := h.storage.GetJettonDataByJettonWallet(ctx, *jettonWallet)
+	if errors.Is(err, core.ErrEntityNotFound) {
 		return &oas.JettonBalance{}, nil
 	}
-	jettonBalance, err := h.convertJettonBalance(ctx, wallets[0], params.Currencies)
 	if err != nil {
-		return nil, err
+		return nil, toError(http.StatusInternalServerError, err)
 	}
-	return &jettonBalance, nil
+	balance := oas.JettonBalance{
+		Jetton: result.Address.ToRaw(),
+		Address: result.Address.ToRaw(),
+		Balance: result.Balance.String(),
+	}
+	return &balance, nil
 }
 
 func (h *Handler) GetBulkAccountJettonBalances(ctx context.Context, request oas.OptGetBulkAccountJettonBalancesReq, params oas.GetBulkAccountJettonBalancesParams) (*oas.AccountBalances, error) {
@@ -103,7 +105,8 @@ func (h *Handler) GetBulkAccountJettonBalances(ctx context.Context, request oas.
 			continue
 		}
 		balances.Balances = append(balances.Balances, oas.AccountBalance{
-			Address: result.Owner.ToRaw(),
+			Owner: result.Owner.ToRaw(),
+			Address: result.Address.ToRaw(),
 			Balance: result.Balance.String(),
 		})
 	}

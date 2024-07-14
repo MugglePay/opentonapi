@@ -4,14 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
-	"strings"
 
 	"github.com/tonkeeper/opentonapi/pkg/bath"
 	"github.com/tonkeeper/opentonapi/pkg/core"
 	"github.com/tonkeeper/opentonapi/pkg/oas"
-	"github.com/tonkeeper/tongo"
-	"github.com/tonkeeper/tongo/liteapi"
 	"github.com/tonkeeper/tongo/ton"
 )
 
@@ -101,63 +97,58 @@ func (h *Handler) convertJettonHistory(ctx context.Context, account ton.AccountI
 	return events, int64(lastLT), nil
 }
 
-func (h *Handler) convertJettonBalance(ctx context.Context, wallet core.JettonWallet, currencies []string) (oas.JettonBalance, error) {
-	todayRates, yesterdayRates, weekRates, monthRates, _ := h.getRates()
-	for idx, currency := range currencies {
-		if jetton, err := tongo.ParseAddress(currency); err == nil {
-			currency = jetton.ID.ToRaw()
-		} else {
-			currency = strings.ToUpper(currency)
-		}
-		currencies[idx] = currency
-	}
-	jettonBalance := oas.JettonBalance{
-		Balance:       wallet.Balance.String(),
-		WalletAddress: convertAccountAddress(wallet.Address, h.addressBook),
-		Extensions:    wallet.Extensions,
-	}
-	if wallet.Lock != nil {
-		jettonBalance.Lock = oas.NewOptJettonBalanceLock(oas.JettonBalanceLock{
-			Amount: wallet.Lock.FullBalance.String(),
-			Till:   wallet.Lock.UnlockTime,
-		})
-	}
-	var err error
-	rates := make(map[string]oas.TokenRates)
-	for _, currency := range currencies {
-		rates, err = convertRates(rates, wallet.JettonAddress.ToRaw(), currency, todayRates, yesterdayRates, weekRates, monthRates)
-		if err != nil {
-			continue
-		}
-	}
-	price := rates[wallet.JettonAddress.ToRaw()]
-	if len(rates) > 0 && len(price.Prices.Value) > 0 {
-		jettonBalance.Price.SetTo(price)
-	}
-	meta, err := h.storage.GetJettonMasterMetadata(ctx, wallet.JettonAddress)
-	if err != nil && err.Error() == "not enough refs" {
-		// happens when metadata is broken, for example.
-		return oas.JettonBalance{}, toError(http.StatusInternalServerError, err)
-	}
-	if err != nil && errors.Is(err, liteapi.ErrOnchainContentOnly) {
-		// we don't support such jettons
-		return oas.JettonBalance{}, toError(http.StatusInternalServerError, err)
-	}
-	if err != nil && !errors.Is(err, core.ErrEntityNotFound) {
-		return oas.JettonBalance{}, toError(http.StatusNotFound, err)
-	}
-	var normalizedMetadata NormalizedMetadata
-	info, ok := h.addressBook.GetJettonInfoByAddress(wallet.JettonAddress)
-	if ok {
-		normalizedMetadata = NormalizeMetadata(meta, &info, core.TrustNone)
-	} else {
-		trust := core.TrustNone
-		if h.spamFilter != nil {
-			trust = h.spamFilter.JettonTrust(wallet.JettonAddress, meta.Symbol, meta.Name, meta.Image)
-		}
-		normalizedMetadata = NormalizeMetadata(meta, nil, trust)
-	}
-	jettonBalance.Jetton = jettonPreview(wallet.JettonAddress, normalizedMetadata)
+// func (h *Handler) convertJettonBalance(ctx context.Context, wallet core.JettonWallet, currencies []string) (oas.JettonBalance, error) {
+// 	todayRates, yesterdayRates, weekRates, monthRates, _ := h.getRates()
+// 	for idx, currency := range currencies {
+// 		if jetton, err := tongo.ParseAddress(currency); err == nil {
+// 			currency = jetton.ID.ToRaw()
+// 		} else {
+// 			currency = strings.ToUpper(currency)
+// 		}
+// 		currencies[idx] = currency
+// 	}
+// 	jettonBalance := oas.JettonBalance{
+// 		Balance:       wallet.Balance.String(),
+// 		WalletAddress: convertAccountAddress(wallet.Address, h.addressBook),
+// 	}
+// 	if wallet.Lock != nil {
+// 		jettonBalance.Lock = oas.NewOptJettonBalanceLock(oas.JettonBalanceLock{
+// 			Amount: wallet.Lock.FullBalance.String(),
+// 			Till:   wallet.Lock.UnlockTime,
+// 		})
+// 	}
+// 	var err error
+// 	rates := make(map[string]oas.TokenRates)
+// 	for _, currency := range currencies {
+// 		rates, err = convertRates(rates, wallet.JettonAddress.ToRaw(), currency, todayRates, yesterdayRates, weekRates, monthRates)
+// 		if err != nil {
+// 			continue
+// 		}
+// 	}
+// 	price := rates[wallet.JettonAddress.ToRaw()]
+// 	if len(rates) > 0 && len(price.Prices.Value) > 0 {
+// 		jettonBalance.Price.SetTo(price)
+// 	}
+// 	meta, err := h.storage.GetJettonMasterMetadata(ctx, wallet.JettonAddress)
+// 	if err != nil && err.Error() == "not enough refs" {
+// 		// happens when metadata is broken, for example.
+// 		return oas.JettonBalance{}, toError(http.StatusInternalServerError, err)
+// 	}
+// 	if err != nil && errors.Is(err, liteapi.ErrOnchainContentOnly) {
+// 		// we don't support such jettons
+// 		return oas.JettonBalance{}, toError(http.StatusInternalServerError, err)
+// 	}
+// 	if err != nil && !errors.Is(err, core.ErrEntityNotFound) {
+// 		return oas.JettonBalance{}, toError(http.StatusNotFound, err)
+// 	}
+// 	var normalizedMetadata NormalizedMetadata
+// 	info, ok := h.addressBook.GetJettonInfoByAddress(wallet.JettonAddress)
+// 	if ok {
+// 		normalizedMetadata = NormalizeMetadata(meta, &info, core.TrustNone)
+// 	} else {
+// 		normalizedMetadata = NormalizeMetadata(meta, nil, h.spamFilter.JettonTrust(wallet.JettonAddress, meta.Symbol, meta.Name, meta.Image))
+// 	}
+// 	jettonBalance.Jetton = jettonPreview(wallet.JettonAddress, normalizedMetadata)
 
-	return jettonBalance, nil
-}
+// 	return jettonBalance, nil
+// }

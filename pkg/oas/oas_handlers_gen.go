@@ -2834,10 +2834,6 @@ func (s *Server) handleGetAccountJettonBalanceRequest(args [2]string, argsEscape
 					Name: "jetton_id",
 					In:   "path",
 				}: params.JettonID,
-				{
-					Name: "currencies",
-					In:   "query",
-				}: params.Currencies,
 			},
 			Raw: r,
 		}

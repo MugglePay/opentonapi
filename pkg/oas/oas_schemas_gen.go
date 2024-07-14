@@ -276,8 +276,14 @@ func (s *AccountAddress) SetIsWallet(val bool) {
 
 // Ref: #/components/schemas/AccountBalance
 type AccountBalance struct {
+	Owner   string `json:"owner"`
 	Address string `json:"address"`
 	Balance string `json:"balance"`
+}
+
+// GetOwner returns the value of Owner.
+func (s *AccountBalance) GetOwner() string {
+	return s.Owner
 }
 
 // GetAddress returns the value of Address.
@@ -288,6 +294,11 @@ func (s *AccountBalance) GetAddress() string {
 // GetBalance returns the value of Balance.
 func (s *AccountBalance) GetBalance() string {
 	return s.Balance
+}
+
+// SetOwner sets the value of Owner.
+func (s *AccountBalance) SetOwner(val string) {
+	s.Owner = val
 }
 
 // SetAddress sets the value of Address.
@@ -7317,12 +7328,19 @@ func (s *InscriptionTransferActionType) UnmarshalText(data []byte) error {
 
 // Ref: #/components/schemas/JettonBalance
 type JettonBalance struct {
-	Balance       string               `json:"balance"`
-	Price         OptTokenRates        `json:"price"`
-	WalletAddress AccountAddress       `json:"wallet_address"`
-	Jetton        JettonPreview        `json:"jetton"`
-	Extensions    []string             `json:"extensions"`
-	Lock          OptJettonBalanceLock `json:"lock"`
+	Jetton  string `json:"jetton"`
+	Address string `json:"address"`
+	Balance string `json:"balance"`
+}
+
+// GetJetton returns the value of Jetton.
+func (s *JettonBalance) GetJetton() string {
+	return s.Jetton
+}
+
+// GetAddress returns the value of Address.
+func (s *JettonBalance) GetAddress() string {
+	return s.Address
 }
 
 // GetBalance returns the value of Balance.
@@ -7330,84 +7348,19 @@ func (s *JettonBalance) GetBalance() string {
 	return s.Balance
 }
 
-// GetPrice returns the value of Price.
-func (s *JettonBalance) GetPrice() OptTokenRates {
-	return s.Price
+// SetJetton sets the value of Jetton.
+func (s *JettonBalance) SetJetton(val string) {
+	s.Jetton = val
 }
 
-// GetWalletAddress returns the value of WalletAddress.
-func (s *JettonBalance) GetWalletAddress() AccountAddress {
-	return s.WalletAddress
-}
-
-// GetJetton returns the value of Jetton.
-func (s *JettonBalance) GetJetton() JettonPreview {
-	return s.Jetton
-}
-
-// GetExtensions returns the value of Extensions.
-func (s *JettonBalance) GetExtensions() []string {
-	return s.Extensions
-}
-
-// GetLock returns the value of Lock.
-func (s *JettonBalance) GetLock() OptJettonBalanceLock {
-	return s.Lock
+// SetAddress sets the value of Address.
+func (s *JettonBalance) SetAddress(val string) {
+	s.Address = val
 }
 
 // SetBalance sets the value of Balance.
 func (s *JettonBalance) SetBalance(val string) {
 	s.Balance = val
-}
-
-// SetPrice sets the value of Price.
-func (s *JettonBalance) SetPrice(val OptTokenRates) {
-	s.Price = val
-}
-
-// SetWalletAddress sets the value of WalletAddress.
-func (s *JettonBalance) SetWalletAddress(val AccountAddress) {
-	s.WalletAddress = val
-}
-
-// SetJetton sets the value of Jetton.
-func (s *JettonBalance) SetJetton(val JettonPreview) {
-	s.Jetton = val
-}
-
-// SetExtensions sets the value of Extensions.
-func (s *JettonBalance) SetExtensions(val []string) {
-	s.Extensions = val
-}
-
-// SetLock sets the value of Lock.
-func (s *JettonBalance) SetLock(val OptJettonBalanceLock) {
-	s.Lock = val
-}
-
-type JettonBalanceLock struct {
-	Amount string `json:"amount"`
-	Till   int64  `json:"till"`
-}
-
-// GetAmount returns the value of Amount.
-func (s *JettonBalanceLock) GetAmount() string {
-	return s.Amount
-}
-
-// GetTill returns the value of Till.
-func (s *JettonBalanceLock) GetTill() int64 {
-	return s.Till
-}
-
-// SetAmount sets the value of Amount.
-func (s *JettonBalanceLock) SetAmount(val string) {
-	s.Amount = val
-}
-
-// SetTill sets the value of Till.
-func (s *JettonBalanceLock) SetTill(val int64) {
-	s.Till = val
 }
 
 // Ref: #/components/schemas/JettonBridgeParams
@@ -12514,52 +12467,6 @@ func (o OptInt64) Or(d int64) int64 {
 	return d
 }
 
-// NewOptJettonBalanceLock returns new OptJettonBalanceLock with value set to v.
-func NewOptJettonBalanceLock(v JettonBalanceLock) OptJettonBalanceLock {
-	return OptJettonBalanceLock{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptJettonBalanceLock is optional JettonBalanceLock.
-type OptJettonBalanceLock struct {
-	Value JettonBalanceLock
-	Set   bool
-}
-
-// IsSet returns true if OptJettonBalanceLock was set.
-func (o OptJettonBalanceLock) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptJettonBalanceLock) Reset() {
-	var v JettonBalanceLock
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptJettonBalanceLock) SetTo(v JettonBalanceLock) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptJettonBalanceLock) Get() (v JettonBalanceLock, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptJettonBalanceLock) Or(d JettonBalanceLock) JettonBalanceLock {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptJettonBridgePrices returns new OptJettonBridgePrices with value set to v.
 func NewOptJettonBridgePrices(v JettonBridgePrices) OptJettonBridgePrices {
 	return OptJettonBridgePrices{
@@ -13428,52 +13335,6 @@ func (o OptSubscriptionAction) Get() (v SubscriptionAction, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptSubscriptionAction) Or(d SubscriptionAction) SubscriptionAction {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptTokenRates returns new OptTokenRates with value set to v.
-func NewOptTokenRates(v TokenRates) OptTokenRates {
-	return OptTokenRates{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptTokenRates is optional TokenRates.
-type OptTokenRates struct {
-	Value TokenRates
-	Set   bool
-}
-
-// IsSet returns true if OptTokenRates was set.
-func (o OptTokenRates) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptTokenRates) Reset() {
-	var v TokenRates
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptTokenRates) SetTo(v TokenRates) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptTokenRates) Get() (v TokenRates, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptTokenRates) Or(d TokenRates) TokenRates {
 	if v, ok := o.Get(); ok {
 		return v
 	}

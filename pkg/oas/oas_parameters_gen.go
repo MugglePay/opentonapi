@@ -2784,8 +2784,6 @@ type GetAccountJettonBalanceParams struct {
 	AccountID string
 	// Jetton ID.
 	JettonID string
-	// Accept ton and all possible fiat currencies, separated by commas.
-	Currencies []string
 }
 
 func unpackGetAccountJettonBalanceParams(packed middleware.Parameters) (params GetAccountJettonBalanceParams) {
@@ -2803,20 +2801,10 @@ func unpackGetAccountJettonBalanceParams(packed middleware.Parameters) (params G
 		}
 		params.JettonID = packed[key].(string)
 	}
-	{
-		key := middleware.ParameterKey{
-			Name: "currencies",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.Currencies = v.([]string)
-		}
-	}
 	return params
 }
 
 func decodeGetAccountJettonBalanceParams(args [2]string, argsEscaped bool, r *http.Request) (params GetAccountJettonBalanceParams, _ error) {
-	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: account_id.
 	if err := func() error {
 		param := args[0]
@@ -2904,49 +2892,6 @@ func decodeGetAccountJettonBalanceParams(args [2]string, argsEscaped bool, r *ht
 		return params, &ogenerrors.DecodeParamError{
 			Name: "jetton_id",
 			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode query: currencies.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "currencies",
-			Style:   uri.QueryStyleForm,
-			Explode: false,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				return d.DecodeArray(func(d uri.Decoder) error {
-					var paramsDotCurrenciesVal string
-					if err := func() error {
-						val, err := d.DecodeValue()
-						if err != nil {
-							return err
-						}
-
-						c, err := conv.ToString(val)
-						if err != nil {
-							return err
-						}
-
-						paramsDotCurrenciesVal = c
-						return nil
-					}(); err != nil {
-						return err
-					}
-					params.Currencies = append(params.Currencies, paramsDotCurrenciesVal)
-					return nil
-				})
-			}); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "currencies",
-			In:   "query",
 			Err:  err,
 		}
 	}

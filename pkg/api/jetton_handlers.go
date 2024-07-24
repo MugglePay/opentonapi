@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"sync"
 
 	"github.com/tonkeeper/opentonapi/pkg/bath"
 	"github.com/tonkeeper/opentonapi/pkg/core"
@@ -85,31 +86,44 @@ func (h *Handler) GetBulkAccountJettonBalances(ctx context.Context, request oas.
 	var balances = oas.AccountBalances{
 		Balances: make([]oas.AccountBalance, 0, len(request.Value.AccountIds)),
 	}
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+
 	for _, accountID := range request.Value.AccountIds {
-		account, err := tongo.ParseAddress(accountID)
-		if err != nil {
-			continue
-		}
-		jettonWallet, err := h.storage.GetJettonWalletByOwnerAddress(ctx, account.ID, jetton.ID)
-		if errors.Is(err, core.ErrEntityNotFound) {
-			continue
-		}
-		if err != nil {
-			continue
-		}
-		result, err := h.storage.GetJettonDataByJettonWallet(ctx, *jettonWallet)
-		if errors.Is(err, core.ErrEntityNotFound) {
-			continue
-		}
-		if err != nil {
-			continue
-		}
-		balances.Balances = append(balances.Balances, oas.AccountBalance{
-			Owner: result.Owner.ToRaw(),
-			Address: result.Address.ToRaw(),
-			Balance: result.Balance.String(),
-		})
+		wg.Add(1)
+		go func(accountID string) {
+			defer wg.Done()
+
+			account, err := tongo.ParseAddress(accountID)
+			if err != nil {
+				return
+			}
+			jettonWallet, err := h.storage.GetJettonWalletByOwnerAddress(ctx, account.ID, jetton.ID)
+			if errors.Is(err, core.ErrEntityNotFound) {
+				return
+			}
+			if err != nil {
+				return
+			}
+			result, err := h.storage.GetJettonDataByJettonWallet(ctx, *jettonWallet)
+			if errors.Is(err, core.ErrEntityNotFound) {
+				return
+			}
+			if err != nil {
+				return
+			}
+
+			mu.Lock()
+			balances.Balances = append(balances.Balances, oas.AccountBalance{
+				Owner:   result.Owner.ToRaw(),
+				Address: result.Address.ToRaw(),
+				Balance: result.Balance.String(),
+			})
+			mu.Unlock()
+		}(accountID)
 	}
+
+	wg.Wait()
 	return &balances, nil
 }
 

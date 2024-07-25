@@ -51,16 +51,15 @@ func (h *Handler) GetAccountJettonBalance(ctx context.Context, params oas.GetAcc
 		return nil, toError(http.StatusBadRequest, err)
 	}
 	jettonWallet, err := h.storage.GetJettonWalletByOwnerAddress(ctx, account.ID, jetton.ID)
-	fmt.Println("jettonWallet Error", err)
-	if errors.Is(err, core.ErrEntityNotFound) || errors.Is(err, core.ErrAccountNotFound) {
+	if errors.Is(err, core.ErrEntityNotFound) {
 		return &oas.JettonBalance{}, nil
 	}
 	if err != nil {
 		return nil, toError(http.StatusInternalServerError, err)
 	}
 	result, err := h.storage.GetJettonDataByJettonWallet(ctx, *jettonWallet)
-	fmt.Println("jettonWallet Data Error", err)
-	if errors.Is(err, core.ErrEntityNotFound) || errors.Is(err, core.ErrAccountNotFound) {
+	fmt.Println(err, core.ErrAccountNotFound, err == core.ErrAccountNotFound)
+	if errors.Is(err, core.ErrAccountNotFound) {
 		return &oas.JettonBalance{}, nil
 	}
 	if err != nil {

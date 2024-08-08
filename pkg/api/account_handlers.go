@@ -152,10 +152,14 @@ func (h *Handler) GetBlockchainAccountTransactions(ctx context.Context, params o
 	txs, err := h.storage.GetAccountTransactions(ctx, account.ID, int(params.Limit.Value),
 		uint64(params.BeforeLt.Value), uint64(params.AfterLt.Value), descendingOrder)
 	if errors.Is(err, core.ErrEntityNotFound) {
-		return &oas.Transactions{}, nil
+		return &oas.Transactions{
+			Transactions: make([]oas.Transaction, 0),
+		}, nil
 	}
 	if err != nil {
-		return nil, toError(http.StatusInternalServerError, err)
+		return &oas.Transactions{
+			Transactions: make([]oas.Transaction, 0),
+		}, nil
 	}
 	result := oas.Transactions{
 		Transactions: make([]oas.Transaction, len(txs)),

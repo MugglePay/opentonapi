@@ -1,7 +1,7 @@
 package api
 
 import (
-	"encoding/hex"
+	"context"
 	"encoding/json"
 	"fmt"
 	"math/big"
@@ -10,21 +10,26 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/tonkeeper/opentonapi/pkg/core"
-	imgGenerator "github.com/tonkeeper/opentonapi/pkg/image"
+	"github.com/go-faster/jx"
+	"github.com/tonkeeper/tongo"
 	"github.com/tonkeeper/tongo/boc"
 	"github.com/tonkeeper/tongo/tlb"
+	"google.golang.org/grpc/status"
 
-	"github.com/go-faster/jx"
+	"github.com/tonkeeper/opentonapi/pkg/core"
+	imgGenerator "github.com/tonkeeper/opentonapi/pkg/image"
 	"github.com/tonkeeper/opentonapi/pkg/oas"
-	"github.com/tonkeeper/tongo"
+	walletPkg "github.com/tonkeeper/opentonapi/pkg/wallet"
 )
 
 func toError(code int, err error) *oas.ErrorStatusCode {
-	msg := err.Error()
 	if strings.HasPrefix(err.Error(), "failed to connect to") || strings.Contains(err.Error(), "host=") {
-		msg = "unknown error"
+		return &oas.ErrorStatusCode{StatusCode: code, Response: oas.Error{Error: "unknown error"}}
 	}
+	if s, ok := status.FromError(err); ok {
+		return &oas.ErrorStatusCode{StatusCode: code, Response: oas.Error{Error: s.Message()}}
+	}
+	msg := err.Error()
 	return &oas.ErrorStatusCode{StatusCode: code, Response: oas.Error{Error: msg}}
 }
 
@@ -179,12 +184,11 @@ func stringToTVMStackRecord(s string) (tlb.VmStackValue, error) {
 		return tlb.TlbStructToVmCellSlice(account.ID.ToMsgAddress())
 	}
 	if strings.HasPrefix(s, "0x") {
-		b, err := hex.DecodeString(s[2:])
-		if err != nil {
-			return tlb.VmStackValue{}, err
-		}
 		i := big.Int{}
-		i.SetBytes(b)
+		_, ok := i.SetString(s[2:], 16)
+		if !ok {
+			return tlb.VmStackValue{}, fmt.Errorf("invalid hex %v", s)
+		}
 		return tlb.VmStackValue{SumType: "VmStkInt", VmStkInt: tlb.Int257(i)}, nil
 	}
 	isDigit := true
@@ -212,7 +216,7 @@ func stringToTVMStackRecord(s string) (tlb.VmStackValue, error) {
 	return tlb.VmStackValue{SumType: "VmStkCell", VmStkCell: tlb.Ref[boc.Cell]{Value: *c}}, nil
 }
 
-func convertMultisig(item core.Multisig) oas.Multisig {
+func (h *Handler) convertMultisig(ctx context.Context, item core.Multisig) (*oas.Multisig, error) {
 	converted := oas.Multisig{
 		Address:   item.AccountID.ToRaw(),
 		Seqno:     item.Seqno,
@@ -229,6 +233,18 @@ func convertMultisig(item core.Multisig) oas.Multisig {
 		for _, account := range order.Signers {
 			signers = append(signers, account.ToRaw())
 		}
+		messages, err := convertMultisigActionsToRawMessages(order.Actions)
+		if err != nil {
+			return nil, err
+		}
+		risk, err := walletPkg.ExtractRiskFromRawMessages(messages)
+		if err != nil {
+			return nil, err
+		}
+		oasRisk, err := h.convertRisk(ctx, *risk, item.AccountID)
+		if err != nil {
+			return nil, err
+		}
 		converted.Orders = append(converted.Orders, oas.MultisigOrder{
 			Address:          order.AccountID.ToRaw(),
 			OrderSeqno:       order.OrderSeqno,
@@ -237,7 +253,8 @@ func convertMultisig(item core.Multisig) oas.Multisig {
 			Signers:          signers,
 			ApprovalsNum:     order.ApprovalsNum,
 			ExpirationDate:   order.ExpirationDate,
+			Risk:             oasRisk,
 		})
 	}
-	return converted
+	return &converted, nil
 }

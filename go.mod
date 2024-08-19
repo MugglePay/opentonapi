@@ -24,16 +24,17 @@ require (
 	github.com/shurcooL/graphql v0.0.0-20220606043923-3cf50f8a0a29
 	github.com/sourcegraph/conc v0.3.0
 	github.com/stretchr/testify v1.9.0
-	github.com/tonkeeper/scam_backoffice_rules v0.0.0-20240606040945-382d2b4edb98
-	github.com/tonkeeper/tongo v1.9.1-0.20240710061111-60ccf2c10f84
+	github.com/tonkeeper/scam_backoffice_rules v0.0.0-20240812140315-a2b21a866ae6
+	github.com/tonkeeper/tongo v1.9.1
 	go.opentelemetry.io/otel v1.24.0
 	go.opentelemetry.io/otel/metric v1.24.0
 	go.opentelemetry.io/otel/trace v1.24.0
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/exp v0.0.0-20230725093048-515e97ebf090
-	golang.org/x/net v0.22.0
+	golang.org/x/net v0.23.0
 	golang.org/x/text v0.14.0
+	google.golang.org/grpc v1.31.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -66,6 +67,7 @@ require (
 	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/tools v0.19.0 // indirect
+	google.golang.org/genproto v0.0.0-20200825200019-8632dd797987 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

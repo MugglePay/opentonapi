@@ -573,8 +573,9 @@ type AccountStorageInfo struct {
 	UsedCells       int64 `json:"used_cells"`
 	UsedBits        int64 `json:"used_bits"`
 	UsedPublicCells int64 `json:"used_public_cells"`
-	LastPaid        int64 `json:"last_paid"`
-	DuePayment      int64 `json:"due_payment"`
+	// Time of the last payment.
+	LastPaid   int64 `json:"last_paid"`
+	DuePayment int64 `json:"due_payment"`
 }
 
 // GetUsedCells returns the value of UsedCells.
@@ -2408,7 +2409,7 @@ func (s *BlockchainBlocks) SetBlocks(val []BlockchainBlock) {
 
 // Ref: #/components/schemas/BlockchainConfig
 type BlockchainConfig struct {
-	// Config boc in base64 format.
+	// Config boc in hex format.
 	Raw string `json:"raw"`
 	// Config address.
 	R0 string `json:"0"`
@@ -7265,6 +7266,7 @@ type JettonBalance struct {
 	Price         OptTokenRates        `json:"price"`
 	WalletAddress AccountAddress       `json:"wallet_address"`
 	Jetton        JettonPreview        `json:"jetton"`
+	Extensions    []string             `json:"extensions"`
 	Lock          OptJettonBalanceLock `json:"lock"`
 }
 
@@ -7286,6 +7288,11 @@ func (s *JettonBalance) GetWalletAddress() AccountAddress {
 // GetJetton returns the value of Jetton.
 func (s *JettonBalance) GetJetton() JettonPreview {
 	return s.Jetton
+}
+
+// GetExtensions returns the value of Extensions.
+func (s *JettonBalance) GetExtensions() []string {
+	return s.Extensions
 }
 
 // GetLock returns the value of Lock.
@@ -7311,6 +7318,11 @@ func (s *JettonBalance) SetWalletAddress(val AccountAddress) {
 // SetJetton sets the value of Jetton.
 func (s *JettonBalance) SetJetton(val JettonPreview) {
 	s.Jetton = val
+}
+
+// SetExtensions sets the value of Extensions.
+func (s *JettonBalance) SetExtensions(val []string) {
+	s.Extensions = val
 }
 
 // SetLock sets the value of Lock.
@@ -7546,7 +7558,8 @@ func (s *JettonBurnAction) SetJetton(val JettonPreview) {
 // Ref: #/components/schemas/JettonHolders
 type JettonHolders struct {
 	Addresses []JettonHoldersAddressesItem `json:"addresses"`
-	Total     int64                        `json:"total"`
+	// Total number of holders.
+	Total int64 `json:"total"`
 }
 
 // GetAddresses returns the value of Addresses.
@@ -7572,7 +7585,8 @@ func (s *JettonHolders) SetTotal(val int64) {
 type JettonHoldersAddressesItem struct {
 	Address string         `json:"address"`
 	Owner   AccountAddress `json:"owner"`
-	Balance string         `json:"balance"`
+	// Balance in the smallest jetton's units.
+	Balance string `json:"balance"`
 }
 
 // GetAddress returns the value of Address.
@@ -8187,6 +8201,34 @@ func (s *JettonTransferAction) SetRefund(val OptRefund) {
 // SetJetton sets the value of Jetton.
 func (s *JettonTransferAction) SetJetton(val JettonPreview) {
 	s.Jetton = val
+}
+
+// Ref: #/components/schemas/JettonTransferPayload
+type JettonTransferPayload struct {
+	// Hex-encoded BoC.
+	CustomPayload OptString `json:"custom_payload"`
+	// Hex-encoded BoC.
+	StateInit OptString `json:"state_init"`
+}
+
+// GetCustomPayload returns the value of CustomPayload.
+func (s *JettonTransferPayload) GetCustomPayload() OptString {
+	return s.CustomPayload
+}
+
+// GetStateInit returns the value of StateInit.
+func (s *JettonTransferPayload) GetStateInit() OptString {
+	return s.StateInit
+}
+
+// SetCustomPayload sets the value of CustomPayload.
+func (s *JettonTransferPayload) SetCustomPayload(val OptString) {
+	s.CustomPayload = val
+}
+
+// SetStateInit sets the value of StateInit.
+func (s *JettonTransferPayload) SetStateInit(val OptString) {
+	s.StateInit = val
 }
 
 // Ref: #/components/schemas/JettonVerificationType
@@ -8916,6 +8958,7 @@ type MultisigOrder struct {
 	Signers          []string `json:"signers"`
 	ApprovalsNum     int32    `json:"approvals_num"`
 	ExpirationDate   int64    `json:"expiration_date"`
+	Risk             Risk     `json:"risk"`
 }
 
 // GetAddress returns the value of Address.
@@ -8953,6 +8996,11 @@ func (s *MultisigOrder) GetExpirationDate() int64 {
 	return s.ExpirationDate
 }
 
+// GetRisk returns the value of Risk.
+func (s *MultisigOrder) GetRisk() Risk {
+	return s.Risk
+}
+
 // SetAddress sets the value of Address.
 func (s *MultisigOrder) SetAddress(val string) {
 	s.Address = val
@@ -8986,6 +9034,11 @@ func (s *MultisigOrder) SetApprovalsNum(val int32) {
 // SetExpirationDate sets the value of ExpirationDate.
 func (s *MultisigOrder) SetExpirationDate(val int64) {
 	s.ExpirationDate = val
+}
+
+// SetRisk sets the value of Risk.
+func (s *MultisigOrder) SetRisk(val Risk) {
+	s.Risk = val
 }
 
 // Ref: #/components/schemas/Multisigs
@@ -14196,6 +14249,7 @@ type ReducedBlock struct {
 	TxQuantity   int       `json:"tx_quantity"`
 	Utime        int64     `json:"utime"`
 	ShardsBlocks []string  `json:"shards_blocks"`
+	Parent       []string  `json:"parent"`
 }
 
 // GetWorkchainID returns the value of WorkchainID.
@@ -14233,6 +14287,11 @@ func (s *ReducedBlock) GetShardsBlocks() []string {
 	return s.ShardsBlocks
 }
 
+// GetParent returns the value of Parent.
+func (s *ReducedBlock) GetParent() []string {
+	return s.Parent
+}
+
 // SetWorkchainID sets the value of WorkchainID.
 func (s *ReducedBlock) SetWorkchainID(val int32) {
 	s.WorkchainID = val
@@ -14266,6 +14325,11 @@ func (s *ReducedBlock) SetUtime(val int64) {
 // SetShardsBlocks sets the value of ShardsBlocks.
 func (s *ReducedBlock) SetShardsBlocks(val []string) {
 	s.ShardsBlocks = val
+}
+
+// SetParent sets the value of Parent.
+func (s *ReducedBlock) SetParent(val []string) {
+	s.Parent = val
 }
 
 // Ref: #/components/schemas/ReducedBlocks
@@ -14532,8 +14596,9 @@ func (s *Seqno) SetSeqno(val int32) {
 
 // Ref: #/components/schemas/ServiceStatus
 type ServiceStatus struct {
-	RestOnline      bool `json:"rest_online"`
-	IndexingLatency int  `json:"indexing_latency"`
+	RestOnline                bool  `json:"rest_online"`
+	IndexingLatency           int   `json:"indexing_latency"`
+	LastKnownMasterchainSeqno int32 `json:"last_known_masterchain_seqno"`
 }
 
 // GetRestOnline returns the value of RestOnline.
@@ -14546,6 +14611,11 @@ func (s *ServiceStatus) GetIndexingLatency() int {
 	return s.IndexingLatency
 }
 
+// GetLastKnownMasterchainSeqno returns the value of LastKnownMasterchainSeqno.
+func (s *ServiceStatus) GetLastKnownMasterchainSeqno() int32 {
+	return s.LastKnownMasterchainSeqno
+}
+
 // SetRestOnline sets the value of RestOnline.
 func (s *ServiceStatus) SetRestOnline(val bool) {
 	s.RestOnline = val
@@ -14554,6 +14624,11 @@ func (s *ServiceStatus) SetRestOnline(val bool) {
 // SetIndexingLatency sets the value of IndexingLatency.
 func (s *ServiceStatus) SetIndexingLatency(val int) {
 	s.IndexingLatency = val
+}
+
+// SetLastKnownMasterchainSeqno sets the value of LastKnownMasterchainSeqno.
+func (s *ServiceStatus) SetLastKnownMasterchainSeqno(val int32) {
+	s.LastKnownMasterchainSeqno = val
 }
 
 // SetWalletBackupOK is response for SetWalletBackup operation.
@@ -14578,9 +14653,9 @@ type SignRawMessage struct {
 	Address string `json:"address"`
 	// Number of nanocoins to send. Decimal string.
 	Amount string `json:"amount"`
-	// Raw one-cell BoC encoded in Base64.
+	// Raw one-cell BoC encoded in hex.
 	Payload OptString `json:"payload"`
-	// Raw once-cell BoC encoded in Base64.
+	// Raw once-cell BoC encoded in hex.
 	StateInit OptString `json:"stateInit"`
 }
 
@@ -14849,7 +14924,8 @@ func (s *SmartContractAction) SetRefund(val OptRefund) {
 
 // Ref: #/components/schemas/StateInit
 type StateInit struct {
-	Boc string `json:"boc"`
+	Boc        string   `json:"boc"`
+	Interfaces []string `json:"interfaces"`
 }
 
 // GetBoc returns the value of Boc.
@@ -14857,9 +14933,19 @@ func (s *StateInit) GetBoc() string {
 	return s.Boc
 }
 
+// GetInterfaces returns the value of Interfaces.
+func (s *StateInit) GetInterfaces() []string {
+	return s.Interfaces
+}
+
 // SetBoc sets the value of Boc.
 func (s *StateInit) SetBoc(val string) {
 	s.Boc = val
+}
+
+// SetInterfaces sets the value of Interfaces.
+func (s *StateInit) SetInterfaces(val []string) {
+	s.Interfaces = val
 }
 
 // Ref: #/components/schemas/StoragePhase

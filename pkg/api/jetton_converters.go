@@ -114,6 +114,7 @@ func (h *Handler) convertJettonBalance(ctx context.Context, wallet core.JettonWa
 	jettonBalance := oas.JettonBalance{
 		Balance:       wallet.Balance.String(),
 		WalletAddress: convertAccountAddress(wallet.Address, h.addressBook),
+		Extensions:    wallet.Extensions,
 	}
 	if wallet.Lock != nil {
 		jettonBalance.Lock = oas.NewOptJettonBalanceLock(oas.JettonBalanceLock{
@@ -150,7 +151,11 @@ func (h *Handler) convertJettonBalance(ctx context.Context, wallet core.JettonWa
 	if ok {
 		normalizedMetadata = NormalizeMetadata(meta, &info, core.TrustNone)
 	} else {
-		normalizedMetadata = NormalizeMetadata(meta, nil, h.spamFilter.JettonTrust(wallet.JettonAddress, meta.Symbol, meta.Name, meta.Image))
+		trust := core.TrustNone
+		if h.spamFilter != nil {
+			trust = h.spamFilter.JettonTrust(wallet.JettonAddress, meta.Symbol, meta.Name, meta.Image)
+		}
+		normalizedMetadata = NormalizeMetadata(meta, nil, trust)
 	}
 	jettonBalance.Jetton = jettonPreview(wallet.JettonAddress, normalizedMetadata)
 

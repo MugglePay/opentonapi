@@ -549,6 +549,15 @@ func (UnimplementedHandler) GetJettonInfo(ctx context.Context, params GetJettonI
 	return r, ht.ErrNotImplemented
 }
 
+// GetJettonTransferPayload implements getJettonTransferPayload operation.
+//
+// Get jetton's custom payload and state init required for transfer.
+//
+// GET /v2/jettons/{jetton_id}/transfer/{account_id}/payload
+func (UnimplementedHandler) GetJettonTransferPayload(ctx context.Context, params GetJettonTransferPayloadParams) (r *JettonTransferPayload, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetJettons implements getJettons operation.
 //
 // Get a list of all indexed jetton masters in the blockchain.

@@ -24610,86 +24610,6 @@ func (s *JettonTransferAction) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode implements json.Marshaler.
-func (s *JettonTransferPayload) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *JettonTransferPayload) encodeFields(e *jx.Encoder) {
-	{
-		if s.CustomPayload.Set {
-			e.FieldStart("custom_payload")
-			s.CustomPayload.Encode(e)
-		}
-	}
-	{
-		if s.StateInit.Set {
-			e.FieldStart("state_init")
-			s.StateInit.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfJettonTransferPayload = [2]string{
-	0: "custom_payload",
-	1: "state_init",
-}
-
-// Decode decodes JettonTransferPayload from json.
-func (s *JettonTransferPayload) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode JettonTransferPayload to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "custom_payload":
-			if err := func() error {
-				s.CustomPayload.Reset()
-				if err := s.CustomPayload.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"custom_payload\"")
-			}
-		case "state_init":
-			if err := func() error {
-				s.StateInit.Reset()
-				if err := s.StateInit.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"state_init\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode JettonTransferPayload")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *JettonTransferPayload) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *JettonTransferPayload) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes JettonVerificationType as json.
 func (s JettonVerificationType) Encode(e *jx.Encoder) {
 	e.Str(string(s))
@@ -32319,17 +32239,9 @@ func (s *ReducedBlock) encodeFields(e *jx.Encoder) {
 		}
 		e.ArrEnd()
 	}
-	{
-		e.FieldStart("parent")
-		e.ArrStart()
-		for _, elem := range s.Parent {
-			e.Str(elem)
-		}
-		e.ArrEnd()
-	}
 }
 
-var jsonFieldsNameOfReducedBlock = [8]string{
+var jsonFieldsNameOfReducedBlock = [7]string{
 	0: "workchain_id",
 	1: "shard",
 	2: "seqno",
@@ -32337,7 +32249,6 @@ var jsonFieldsNameOfReducedBlock = [8]string{
 	4: "tx_quantity",
 	5: "utime",
 	6: "shards_blocks",
-	7: "parent",
 }
 
 // Decode decodes ReducedBlock from json.
@@ -32439,26 +32350,6 @@ func (s *ReducedBlock) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"shards_blocks\"")
 			}
-		case "parent":
-			requiredBitSet[0] |= 1 << 7
-			if err := func() error {
-				s.Parent = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.Parent = append(s.Parent, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"parent\"")
-			}
 		default:
 			return d.Skip()
 		}
@@ -32469,7 +32360,7 @@ func (s *ReducedBlock) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b11110111,
+		0b01110111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

@@ -8211,34 +8211,6 @@ func (s *JettonTransferAction) SetJetton(val JettonPreview) {
 	s.Jetton = val
 }
 
-// Ref: #/components/schemas/JettonTransferPayload
-type JettonTransferPayload struct {
-	// Hex-encoded BoC.
-	CustomPayload OptString `json:"custom_payload"`
-	// Hex-encoded BoC.
-	StateInit OptString `json:"state_init"`
-}
-
-// GetCustomPayload returns the value of CustomPayload.
-func (s *JettonTransferPayload) GetCustomPayload() OptString {
-	return s.CustomPayload
-}
-
-// GetStateInit returns the value of StateInit.
-func (s *JettonTransferPayload) GetStateInit() OptString {
-	return s.StateInit
-}
-
-// SetCustomPayload sets the value of CustomPayload.
-func (s *JettonTransferPayload) SetCustomPayload(val OptString) {
-	s.CustomPayload = val
-}
-
-// SetStateInit sets the value of StateInit.
-func (s *JettonTransferPayload) SetStateInit(val OptString) {
-	s.StateInit = val
-}
-
 // Ref: #/components/schemas/JettonVerificationType
 type JettonVerificationType string
 
@@ -14211,7 +14183,6 @@ type ReducedBlock struct {
 	TxQuantity   int       `json:"tx_quantity"`
 	Utime        int64     `json:"utime"`
 	ShardsBlocks []string  `json:"shards_blocks"`
-	Parent       []string  `json:"parent"`
 }
 
 // GetWorkchainID returns the value of WorkchainID.
@@ -14249,11 +14220,6 @@ func (s *ReducedBlock) GetShardsBlocks() []string {
 	return s.ShardsBlocks
 }
 
-// GetParent returns the value of Parent.
-func (s *ReducedBlock) GetParent() []string {
-	return s.Parent
-}
-
 // SetWorkchainID sets the value of WorkchainID.
 func (s *ReducedBlock) SetWorkchainID(val int32) {
 	s.WorkchainID = val
@@ -14287,11 +14253,6 @@ func (s *ReducedBlock) SetUtime(val int64) {
 // SetShardsBlocks sets the value of ShardsBlocks.
 func (s *ReducedBlock) SetShardsBlocks(val []string) {
 	s.ShardsBlocks = val
-}
-
-// SetParent sets the value of Parent.
-func (s *ReducedBlock) SetParent(val []string) {
-	s.Parent = val
 }
 
 // Ref: #/components/schemas/ReducedBlocks

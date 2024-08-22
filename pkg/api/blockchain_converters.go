@@ -124,9 +124,9 @@ func convertReducedBlock(block core.ReducedBlock) oas.ReducedBlock {
 	for _, s := range block.ShardsBlocks {
 		converted.ShardsBlocks = append(converted.ShardsBlocks, s.String())
 	}
-	for _, s := range block.ParentBlocks {
-		converted.Parent = append(converted.Parent, s.String())
-	}
+	// for _, s := range block.ParentBlocks {
+	// 	converted.Parent = append(converted.Parent, s.String())
+	// }
 	return converted
 }
 

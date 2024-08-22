@@ -3295,8 +3295,6 @@ type GetAccountJettonsBalancesParams struct {
 	AccountID string
 	// Accept ton and all possible fiat currencies, separated by commas.
 	Currencies []string
-	// Comma separated list supported extensions.
-	SupportedExtensions []string
 }
 
 func unpackGetAccountJettonsBalancesParams(packed middleware.Parameters) (params GetAccountJettonsBalancesParams) {
@@ -3314,15 +3312,6 @@ func unpackGetAccountJettonsBalancesParams(packed middleware.Parameters) (params
 		}
 		if v, ok := packed[key]; ok {
 			params.Currencies = v.([]string)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "supported_extensions",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.SupportedExtensions = v.([]string)
 		}
 	}
 	return params
@@ -3414,49 +3403,6 @@ func decodeGetAccountJettonsBalancesParams(args [1]string, argsEscaped bool, r *
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "currencies",
-			In:   "query",
-			Err:  err,
-		}
-	}
-	// Decode query: supported_extensions.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "supported_extensions",
-			Style:   uri.QueryStyleForm,
-			Explode: false,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				return d.DecodeArray(func(d uri.Decoder) error {
-					var paramsDotSupportedExtensionsVal string
-					if err := func() error {
-						val, err := d.DecodeValue()
-						if err != nil {
-							return err
-						}
-
-						c, err := conv.ToString(val)
-						if err != nil {
-							return err
-						}
-
-						paramsDotSupportedExtensionsVal = c
-						return nil
-					}(); err != nil {
-						return err
-					}
-					params.SupportedExtensions = append(params.SupportedExtensions, paramsDotSupportedExtensionsVal)
-					return nil
-				})
-			}); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "supported_extensions",
 			In:   "query",
 			Err:  err,
 		}
@@ -7589,126 +7535,6 @@ func decodeGetJettonInfoParams(args [1]string, argsEscaped bool, r *http.Request
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "account_id",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// GetJettonTransferPayloadParams is parameters of getJettonTransferPayload operation.
-type GetJettonTransferPayloadParams struct {
-	// Account ID.
-	AccountID string
-	// Jetton ID.
-	JettonID string
-}
-
-func unpackGetJettonTransferPayloadParams(packed middleware.Parameters) (params GetJettonTransferPayloadParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "account_id",
-			In:   "path",
-		}
-		params.AccountID = packed[key].(string)
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "jetton_id",
-			In:   "path",
-		}
-		params.JettonID = packed[key].(string)
-	}
-	return params
-}
-
-func decodeGetJettonTransferPayloadParams(args [2]string, argsEscaped bool, r *http.Request) (params GetJettonTransferPayloadParams, _ error) {
-	// Decode path: account_id.
-	if err := func() error {
-		param := args[1]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[1])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "account_id",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.AccountID = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "account_id",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	// Decode path: jetton_id.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "jetton_id",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.JettonID = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "jetton_id",
 			In:   "path",
 			Err:  err,
 		}

@@ -378,12 +378,6 @@ type Handler interface {
 	//
 	// GET /v2/jettons/{account_id}
 	GetJettonInfo(ctx context.Context, params GetJettonInfoParams) (*JettonInfo, error)
-	// GetJettonTransferPayload implements getJettonTransferPayload operation.
-	//
-	// Get jetton's custom payload and state init required for transfer.
-	//
-	// GET /v2/jettons/{jetton_id}/transfer/{account_id}/payload
-	GetJettonTransferPayload(ctx context.Context, params GetJettonTransferPayloadParams) (*JettonTransferPayload, error)
 	// GetJettons implements getJettons operation.
 	//
 	// Get a list of all indexed jetton masters in the blockchain.

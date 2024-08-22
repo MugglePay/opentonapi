@@ -339,22 +339,6 @@
      "type": "integer"
     }
    },
-   "supportedExtensions": {
-    "description": "comma separated list supported extensions",
-    "explode": false,
-    "in": "query",
-    "name": "supported_extensions",
-    "required": false,
-    "schema": {
-     "example": [
-      "custom_payload"
-     ],
-     "items": {
-      "type": "string"
-     },
-     "type": "array"
-    }
-   },
    "targetBlockIDExtQuery": {
     "description": "target block: (workchain,shard,seqno,root_hash,file_hash)",
     "in": "query",
@@ -601,7 +585,6 @@
       "schema": {
        "properties": {
         "body": {
-         "format": "cell-base64",
          "type": "string"
         }
        },
@@ -3513,16 +3496,6 @@
       "example": 597968399,
       "type": "string"
      },
-     "extensions": {
-      "example": [
-       "custom_payload",
-       "non_transferable"
-      ],
-      "items": {
-       "type": "string"
-      },
-      "type": "array"
-     },
      "jetton": {
       "example": "0:0BB5A9F69043EEBDDA5AD2E946EB953242BD8F603FE795D90698CEEC6BFC60A0",
       "type": "string"
@@ -4853,17 +4826,6 @@
       "example": "(-1,4234234,8000000000000000)",
       "type": "string"
      },
-     "parent": {
-      "items": {
-       "example": [
-        "(0",
-        21734018,
-        "8000000000000000)"
-       ],
-       "type": "string"
-      },
-      "type": "array"
-     },
      "seqno": {
       "example": 21734019,
       "format": "int32",
@@ -4876,7 +4838,7 @@
      "shards_blocks": {
       "items": {
        "example": [
-        "(0",
+        "(-1",
         4234235,
         "8000000000000000)"
        ],
@@ -6458,8 +6420,7 @@
      }
     },
     "tags": [
-     "Emulation",
-     "Accounts"
+     "Emulation"
     ]
    }
   },
@@ -6518,9 +6479,6 @@
      },
      {
       "$ref": "#/components/parameters/currenciesQuery"
-     },
-     {
-      "$ref": "#/components/parameters/supportedExtensions"
      }
     ],
     "responses": {
@@ -7843,8 +7801,7 @@
      }
     },
     "tags": [
-     "Emulation",
-     "Events"
+     "Emulation"
     ]
    }
   },
@@ -8395,38 +8352,6 @@
        }
       },
       "description": "jetton's holders"
-     },
-     "default": {
-      "$ref": "#/components/responses/Error"
-     }
-    },
-    "tags": [
-     "Jettons"
-    ]
-   }
-  },
-  "/v2/jettons/{jetton_id}/transfer/{account_id}/payload": {
-   "get": {
-    "description": "Get jetton's custom payload and state init required for transfer",
-    "operationId": "getJettonTransferPayload",
-    "parameters": [
-     {
-      "$ref": "#/components/parameters/accountIDParameter"
-     },
-     {
-      "$ref": "#/components/parameters/jettonIDParameter"
-     }
-    ],
-    "responses": {
-     "200": {
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/JettonTransferPayload"
-        }
-       }
-      },
-      "description": "jetton's custom payload"
      },
      "default": {
       "$ref": "#/components/responses/Error"
@@ -10275,8 +10200,7 @@
      }
     },
     "tags": [
-     "Emulation",
-     "Traces"
+     "Emulation"
     ]
    }
   },
@@ -10443,7 +10367,6 @@
      }
     },
     "tags": [
-     "Wallet",
      "Emulation"
     ]
    }

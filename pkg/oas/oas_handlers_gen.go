@@ -3096,10 +3096,6 @@ func (s *Server) handleGetAccountJettonsBalancesRequest(args [1]string, argsEsca
 					Name: "currencies",
 					In:   "query",
 				}: params.Currencies,
-				{
-					Name: "supported_extensions",
-					In:   "query",
-				}: params.SupportedExtensions,
 			},
 			Raw: r,
 		}
@@ -7244,127 +7240,6 @@ func (s *Server) handleGetJettonInfoRequest(args [1]string, argsEscaped bool, w 
 	}
 
 	if err := encodeGetJettonInfoResponse(response, w, span); err != nil {
-		recordError("EncodeResponse", err)
-		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-		}
-		return
-	}
-}
-
-// handleGetJettonTransferPayloadRequest handles getJettonTransferPayload operation.
-//
-// Get jetton's custom payload and state init required for transfer.
-//
-// GET /v2/jettons/{jetton_id}/transfer/{account_id}/payload
-func (s *Server) handleGetJettonTransferPayloadRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("getJettonTransferPayload"),
-		semconv.HTTPMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/v2/jettons/{jetton_id}/transfer/{account_id}/payload"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "GetJettonTransferPayload",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	s.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "GetJettonTransferPayload",
-			ID:   "getJettonTransferPayload",
-		}
-	)
-	params, err := decodeGetJettonTransferPayloadParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	var response *JettonTransferPayload
-	if m := s.cfg.Middleware; m != nil {
-		mreq := middleware.Request{
-			Context:          ctx,
-			OperationName:    "GetJettonTransferPayload",
-			OperationSummary: "",
-			OperationID:      "getJettonTransferPayload",
-			Body:             nil,
-			Params: middleware.Parameters{
-				{
-					Name: "account_id",
-					In:   "path",
-				}: params.AccountID,
-				{
-					Name: "jetton_id",
-					In:   "path",
-				}: params.JettonID,
-			},
-			Raw: r,
-		}
-
-		type (
-			Request  = struct{}
-			Params   = GetJettonTransferPayloadParams
-			Response = *JettonTransferPayload
-		)
-		response, err = middleware.HookMiddleware[
-			Request,
-			Params,
-			Response,
-		](
-			m,
-			mreq,
-			unpackGetJettonTransferPayloadParams,
-			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.GetJettonTransferPayload(ctx, params)
-				return response, err
-			},
-		)
-	} else {
-		response, err = s.h.GetJettonTransferPayload(ctx, params)
-	}
-	if err != nil {
-		if errRes, ok := errors.Into[*ErrorStatusCode](err); ok {
-			if err := encodeErrorResponse(errRes, w, span); err != nil {
-				recordError("Internal", err)
-			}
-			return
-		}
-		if errors.Is(err, ht.ErrNotImplemented) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
-			recordError("Internal", err)
-		}
-		return
-	}
-
-	if err := encodeGetJettonTransferPayloadResponse(response, w, span); err != nil {
 		recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)

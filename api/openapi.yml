@@ -599,6 +599,7 @@ paths:
         - $ref: '#/components/parameters/accountIDParameter'
         - $ref: '#/components/parameters/jettonIDParameter'
         - $ref: '#/components/parameters/currenciesQuery'
+        - $ref: '#/components/parameters/supportedExtensions'
       responses:
         '200':
           description: account jetton balance
@@ -640,6 +641,7 @@ paths:
           schema:
             type: integer
             format: int64
+            maximum: 2114380800
             example: 1668436763
         - name: end_date
           in: query
@@ -647,6 +649,7 @@ paths:
           schema:
             type: integer
             format: int64
+            maximum: 2114380800
             example: 1668436763
       responses:
         '200':
@@ -690,6 +693,7 @@ paths:
           schema:
             type: integer
             format: int64
+            maximum: 2114380800
             example: 1668436763
         - name: end_date
           in: query
@@ -697,6 +701,7 @@ paths:
           schema:
             type: integer
             format: int64
+            maximum: 2114380800
             example: 1668436763
       responses:
         '200':
@@ -767,6 +772,7 @@ paths:
           schema:
             type: integer
             format: int64
+            maximum: 2114380800
             example: 1668436763
         - name: end_date
           in: query
@@ -774,6 +780,7 @@ paths:
           schema:
             type: integer
             format: int64
+            maximum: 2114380800
             example: 1668436763
       responses:
         '200':
@@ -824,6 +831,7 @@ paths:
           schema:
             type: integer
             format: int64
+            maximum: 2114380800
             example: 1668436763
         - name: end_date
           in: query
@@ -831,6 +839,7 @@ paths:
           schema:
             type: integer
             format: int64
+            maximum: 2114380800
             example: 1668436763
       responses:
         '200':
@@ -1027,6 +1036,7 @@ paths:
           schema:
             type: integer
             format: int64
+            maximum: 2114380800
             example: 1668436763
         - name: end_date
           in: query
@@ -1034,6 +1044,7 @@ paths:
           schema:
             type: integer
             format: int64
+            maximum: 2114380800
             example: 1668436763
       responses:
         '200':
@@ -1256,6 +1267,7 @@ paths:
           schema:
             type: integer
             format: int64
+            maximum: 2114380800
             example: 1668436763
         - name: end_date
           in: query
@@ -1263,6 +1275,7 @@ paths:
           schema:
             type: integer
             format: int64
+            maximum: 2114380800
             example: 1668436763
       responses:
         '200':
@@ -1786,6 +1799,7 @@ paths:
           schema:
             type: integer
             format: int64
+            maximum: 2114380800
             example: 1668436763
         - name: end_date
           in: query
@@ -1793,6 +1807,7 @@ paths:
           schema:
             type: integer
             format: int64
+            maximum: 2114380800
             example: 1668436763
         - name: points_count
           in: query
@@ -2763,8 +2778,8 @@ paths:
       description: Emulate sending message to blockchain
       operationId: emulateMessageToWallet
       tags:
-        - Wallet
         - Emulation
+        - Wallet
       parameters:
         - $ref: '#/components/parameters/i18n'
       requestBody:
@@ -3091,7 +3106,7 @@ components:
         type: array
         items:
           type: string
-        example: ["custom_payload"]
+        example: [ "custom_payload" ]
     currencyQuery:
       in: query
       name: currency
@@ -3666,9 +3681,9 @@ components:
           format: cell
           example: b5ee9c72010106010044000114ff00f4a413f4bcf2c80b01020120020302014804050004f2300038d06c21d31f30ed44d0d33f3001c00197a4c8cb3fc9ed549330f206e20011a13431da89a1a67e61
         interfaces:
-            type: array
-            items:
-                type: string
+          type: array
+          items:
+            type: string
     Message:
       type: object
       required:
@@ -5344,6 +5359,8 @@ components:
           example: https://cache.tonapi.io/images/jetton.jpg
         verification:
           $ref: '#/components/schemas/JettonVerificationType'
+        custom_payload_api_uri:  # todo: maybe remove
+          type: string
     JettonBalance:
       type: object
       required:
@@ -5573,6 +5590,8 @@ components:
         - approvals_num
         - expiration_date
         - risk
+        - creation_date
+        - signed_by
       properties:
         address:
           type: string
@@ -5602,6 +5621,15 @@ components:
           format: int64
         risk:
           $ref: '#/components/schemas/Risk'
+        creation_date:
+          type: integer
+          format: int64
+        signed_by:
+          type: array
+          items:
+            type: string
+            format: address
+            example: "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf"
     Refund:
       type: object
       required:
@@ -6785,6 +6813,9 @@ components:
           items:
             type: string
             example: [ "https://coinmarketcap.com/currencies/drv/", "https://www.coingecko.com/en/coins/durov" ]
+        custom_payload_api_uri:
+          type: string
+          example: "https://claim-api.tonapi.io/jettons/TESTMINT"
     InscriptionBalances:
       type: object
       required:
@@ -6885,7 +6916,7 @@ components:
     JettonTransferPayload:
       type: object
       required:
-          - payload
+        - payload
       properties:
         custom_payload:
           type: string

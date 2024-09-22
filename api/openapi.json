@@ -3696,6 +3696,10 @@
       },
       "type": "array"
      },
+     "custom_payload_api_uri": {
+      "example": "https://claim-api.tonapi.io/jettons/TESTMINT",
+      "type": "string"
+     },
      "decimals": {
       "example": "9",
       "type": "string"
@@ -3777,6 +3781,9 @@
      "address": {
       "example": "0:0BB5A9F69043EEBDDA5AD2E946EB953242BD8F603FE795D90698CEEC6BFC60A0",
       "format": "address",
+      "type": "string"
+     },
+     "custom_payload_api_uri": {
       "type": "string"
      },
      "decimals": {
@@ -4317,6 +4324,10 @@
       "format": "int32",
       "type": "integer"
      },
+     "creation_date": {
+      "format": "int64",
+      "type": "integer"
+     },
      "expiration_date": {
       "format": "int64",
       "type": "integer"
@@ -4332,6 +4343,14 @@
      "sent_for_execution": {
       "example": false,
       "type": "boolean"
+     },
+     "signed_by": {
+      "items": {
+       "example": "0:da6b1b6663a0e4d18cc8574ccd9db5296e367dd9324706f3bbd9eb1cd2caf0bf",
+       "format": "address",
+       "type": "string"
+      },
+      "type": "array"
      },
      "signers": {
       "items": {
@@ -4354,7 +4373,9 @@
      "signers",
      "approvals_num",
      "expiration_date",
-     "risk"
+     "risk",
+     "creation_date",
+     "signed_by"
     ],
     "type": "object"
    },
@@ -6193,6 +6214,7 @@
       "schema": {
        "example": 1668436763,
        "format": "int64",
+       "maximum": 2114380800,
        "type": "integer"
       }
      },
@@ -6203,6 +6225,7 @@
       "schema": {
        "example": 1668436763,
        "format": "int64",
+       "maximum": 2114380800,
        "type": "integer"
       }
      }
@@ -6352,6 +6375,7 @@
       "schema": {
        "example": 1668436763,
        "format": "int64",
+       "maximum": 2114380800,
        "type": "integer"
       }
      },
@@ -6362,6 +6386,7 @@
       "schema": {
        "example": 1668436763,
        "format": "int64",
+       "maximum": 2114380800,
        "type": "integer"
       }
      }
@@ -6551,6 +6576,7 @@
       "schema": {
        "example": 1668436763,
        "format": "int64",
+       "maximum": 2114380800,
        "type": "integer"
       }
      },
@@ -6561,6 +6587,7 @@
       "schema": {
        "example": 1668436763,
        "format": "int64",
+       "maximum": 2114380800,
        "type": "integer"
       }
      }
@@ -6598,6 +6625,9 @@
      },
      {
       "$ref": "#/components/parameters/currenciesQuery"
+     },
+     {
+      "$ref": "#/components/parameters/supportedExtensions"
      }
     ],
     "responses": {
@@ -6664,6 +6694,7 @@
       "schema": {
        "example": 1668436763,
        "format": "int64",
+       "maximum": 2114380800,
        "type": "integer"
       }
      },
@@ -6674,6 +6705,7 @@
       "schema": {
        "example": 1668436763,
        "format": "int64",
+       "maximum": 2114380800,
        "type": "integer"
       }
      }
@@ -6816,6 +6848,7 @@
       "schema": {
        "example": 1668436763,
        "format": "int64",
+       "maximum": 2114380800,
        "type": "integer"
       }
      },
@@ -6826,6 +6859,7 @@
       "schema": {
        "example": 1668436763,
        "format": "int64",
+       "maximum": 2114380800,
        "type": "integer"
       }
      }
@@ -9624,6 +9658,7 @@
       "schema": {
        "example": 1668436763,
        "format": "int64",
+       "maximum": 2114380800,
        "type": "integer"
       }
      },
@@ -9634,6 +9669,7 @@
       "schema": {
        "example": 1668436763,
        "format": "int64",
+       "maximum": 2114380800,
        "type": "integer"
       }
      }
@@ -9790,6 +9826,7 @@
       "schema": {
        "example": 1668436763,
        "format": "int64",
+       "maximum": 2114380800,
        "type": "integer"
       }
      },
@@ -9800,6 +9837,7 @@
       "schema": {
        "example": 1668436763,
        "format": "int64",
+       "maximum": 2114380800,
        "type": "integer"
       }
      },
@@ -10381,8 +10419,8 @@
      }
     },
     "tags": [
-     "Wallet",
-     "Emulation"
+     "Emulation",
+     "Wallet"
     ]
    }
   },
